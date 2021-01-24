@@ -51,7 +51,7 @@
 						<hr>
 						<div class="row mt-0">
 							<div class="col-sm">
-								<small class="text-muted">updated {{ question.submission_time }}</small>
+								<small class="text-muted">updated {{ question.submission_time.strftime('%y-%m-%d') }}</small>
 							</div>
 							<div class="col-sm">
 								<small class="text-muted">score: {{ question.vote_number }} votes</small>

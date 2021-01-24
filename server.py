@@ -1,7 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
-
+# from flask_login import login_user, current_user, logout_user, login_required, LoginManager
 from util import os
 from werkzeug.utils import secure_filename
+from forms import RegistrationForm, LoginForm
 import data_manager
 
 app = Flask(__name__)
@@ -12,6 +13,10 @@ app.config.update(
     MAX_CONTENT_LENGTH=3 * 1024 * 1024,
     UPLOAD_EXTENSIONS=['.jpg', '.png', '.jpeg'],
     UPLOAD_PATH='static/img')
+
+# login_manager = LoginManager(app)
+# login_manager.login_view = 'route_login'
+# login_manager.login_message_category = 'info'
 
 
 def save_image(file_ext, img, img_name):
@@ -34,6 +39,26 @@ def too_large(e):
     return redirect(url_for('route_add_question', )), 413, {"Refresh": "0; url=/add-question"}
 
 
+@app.route("/register", methods=['GET', 'POST'])
+def route_register():
+    form = RegistrationForm()
+
+    return render_template('register.html', form=form)
+
+
+@app.route("/login", methods=['GET', 'POST'])
+def route_login():
+    form = LoginForm()
+
+    return render_template('login.html', form=form)
+
+
+@app.route("/logout")
+def route_logout():
+    # logout_user()
+    return redirect(url_for('route_list'))
+
+
 @app.route("/")
 @app.route("/list", methods=['GET'])
 def route_list(order_by=data_manager.DEFAULT_ORDER_BY, order_direction=data_manager.DEFAULT_ORDER_DIR):
@@ -45,9 +70,9 @@ def route_list(order_by=data_manager.DEFAULT_ORDER_BY, order_direction=data_mana
     return render_template('list.html', questions=questions, asc_desc=switch_order_direction)
 
 
-@app.route('/update')
-def route_update():
-    return render_template('update.html')
+# @app.route('/update')
+# def route_update():
+#     return render_template('update.html')
 
 
 @app.route('/add-question', methods=['GET', 'POST'])

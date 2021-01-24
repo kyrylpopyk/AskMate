@@ -1,3 +1,52 @@
+{# render wtf fields vith validartion  #}
+{% macro macro_render_field(field) %}
+	<div class="form-label">
+		{{ field.label(class="form-control-label mt-2") }}
+		{% if field.errors %}
+			{{ field(class="form-control is-invalid") }}
+			<div class="invalid-feedback">
+				{% for error in field.errors %}
+					<span>{{ error }}</span>
+				{% endfor %}
+			</div>
+		{% else %}
+			{{ field(class="form-control", **kwargs)|safe }}
+		{% endif %}
+	</div>
+{% endmacro %}
+
+{# upload picture button #}
+{% macro macro_upload_picture(field) %}
+	{{ field.label }}
+	{% if field.errors %}
+		{{ field(class="form-control-file mb-2") }}
+		{% for error in field.errors %}<br>
+			<span class="text-danger">{{ error }}</span>
+		{% endfor %}
+	{% else %}
+		{{ field(class="form-control-label mt-2", accept="image/*") }}
+	{% endif %}
+{% endmacro %}
+
+{# render wtf fields with validartion  #}
+{% macro macro_render_select_field(field) %}
+	<div class="input-group w-25">
+		{{ field.label(class="input-group-text") }}
+		{% if field.errors %}
+			{{ field(class="form-control is-invalid") }}
+			<div class="invalid-feedback">
+				{% for error in field.errors %}
+					<span>{{ error }}</span>
+				{% endfor %}
+			</div>
+		{% else %}
+			{{ field(class="form-control", **kwargs)|safe }}
+		{% endif %}
+	</div>
+{% endmacro %}
+
+
+
 {# answer or answers  plural/singular #}
 {%- macro macro_answer_pl_sg(count_it='') -%}
 	{%- set count_answers =  count_it -%}
