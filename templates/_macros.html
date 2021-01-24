@@ -1,0 +1,115 @@
+{# answer or answers  plural/singular #}
+{%- macro macro_answer_pl_sg(count_it='') -%}
+	{%- set count_answers =  count_it -%}
+	{%- if count_answers == 1 -%}
+		answer {{ count_answers }}
+	{% else -%}
+		answers {{ count_answers }}
+	{%- endif -%}
+{%- endmacro -%}
+
+{# comment  plural/singular #}
+{%- macro macro_comment_pl_sg(count_it='') -%}
+	{%- set count_comment =  count_it %}
+	{%- if count_comment == 1 -%}
+		comment {{ count_comment }}
+	{%- else -%}
+		comments {{ count_comment }}
+	{%- endif -%}
+{%- endmacro -%}
+
+{# highlight search results #}
+{%- macro macro_heihlight_search_pharse(column="", search_phrase="") -%}
+	{% set style = '<span class="bg-warning">{}</span>' %}
+	{%- if search_phrase -%}
+		{% set strip_tags = column|striptags %}
+		{{ strip_tags.replace(search_phrase, style.format(search_phrase)).replace(search_phrase|title, style.format(search_phrase|title))|safe }}
+	{%- else -%}
+		{{ column|truncate(270, True, '...') }}
+	{%- endif -%}
+{%- endmacro -%}
+
+{# votes add plus for positive #}
+{%- macro macro_votes(question_votes="") %}
+	{%- set votes = question_votes -%}
+	{%- if votes >= 1 -%}
+		+{{ votes }}
+	{%- else -%}
+		{{ votes }}
+	{%- endif -%}
+{%- endmacro -%}
+
+{# sorting bar #}
+{% macro sort_bar(route="", data="", order_direction="", search_phrase="") %}
+	{%- if data.total == 0 %}
+		<div class="container mt-3">
+			<p>Your search - did not match any documents.</p>
+			<p>Suggestions:</p>
+			<ul>
+				<li>Make sure that all words are spelled correctly.</li>
+				<li>Try different keywords.</li>
+				<li>Try more general keywords.</li>
+			</ul>
+		</div>
+	{%- else -%}
+		{%- set dict_sort_by = ({'Title': 'title', 'View': 'view_number', 'Votes': 'vote_number'}) -%}
+		<div class="container mt-3 px-0">
+			<div class="row">
+				<div class="col p-1 fs-3 ms-2">
+					<p class="fs-5">
+						{% if request.endpoint == 'route_home' %}{{ data.total }} questions
+						{% else %}about {{ data.total }} results for: {{ search_phrase }}
+							</p>
+						{% endif %}
+				</div>
+				<div class="col text-end">
+					<div class="btn-group" role="group" aria-label="Basic outlined">
+						{% for item, value in dict_sort_by.items() -%}
+							<a href="{{ url_for(route, page=data.page, order_by=value, order_direction=order_direction) }}" type="button" class="btn mt-0 btn-outline-primary">{{ item }}&nbsp;<i class="fas fa-sort"></i></a>
+						{% endfor -%}
+					</div>
+				</div>
+			</div>
+		</div>
+	{% endif %}
+{%- endmacro -%}
+
+{# generate list of questions#}
+{% macro macro_generate_question_list(item="", the_list="", route="", search_phrase='') %}
+	{% for item in the_list %}
+		<div class="card text-dark bg-light mt-3">
+			<div class="card-header d-flex">
+				<div class="col-10  fw-bold text-start">
+					<span class="badge bg-success">{{ macro_votes(question_votes=item.votes) }}</span>&nbsp;
+					<a class="text-decoration-none" href="{{ url_for('route_question', question_id=item.id,  questions_views=1) }}">{{ macro_heihlight_search_pharse(column=item.title, search_phrase=search_phrase) }}</a>
+					<span class="badge bg-primary"><a class="link-light text-decoration-none" href="#">tag</a></span>
+				</div>
+				<ul class="col-2 list-inline text-end mb-0">
+					<li class="list-inline-item">
+						<small class="text-muted">{{ item.time.strftime('%y-%m-%d') }}</small></li>
+					<li class="list-inline-item"><small class="text-muted">{{ item.view_number }} views</small>
+					</li>
+					<li class="list-inline-item"></li>
+				</ul>
+			</div>
+			<div class="card-body pb-1">
+				<div class="row">
+					<p class="card-text">{{ macro_heihlight_search_pharse(column=item.message, search_phrase=search_phrase) }}</p>
+					<hr class="m-1">
+					<ul class="list-inline text-end mb-0">
+						<li class="list-inline-item">
+							<span class="badge bg-success">3 answers</span>
+						</li>
+						<li class="list-inline-item">
+							<span class="badge bg-secondary"> 3 comments </span>
+						</li>
+						<li class="list-inline-item">
+							<span class="badge bg-dark"><a class="link-light text-decoration-none" href="">nickname</a></span>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	{% endfor %}
+{% endmacro %}
+

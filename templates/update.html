@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block head %}{{ super() }}{% endblock %}
+{% block title %}Updated{% endblock %}
+{% block content %}
+	<div class="container">
+	<h1>Data updated</h1>
+	<p><a href="{{ url_for('route_list') }}">back to main page</a>
+	</div>
+{% endblock %}

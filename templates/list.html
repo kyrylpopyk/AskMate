@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import macro_generate_question_list, sort_bar %}
+{% block title %}Questions{% endblock %}
+{% block content %}
+	<div class="container">
+
+	{{ sort_bar(route="route_list", data=questions, order_direction=asc_desc, search_phrase="") }}
+
+	{{ macro_generate_question_list(item=question, the_list=questions, route='route_list', search_phrase='') }}
+
+
+	</div>
+{% endblock -%}
+

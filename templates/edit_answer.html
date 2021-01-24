@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{%  block title %}edit answer{% endblock %}
+{% block head %}{{ super() }}{% endblock %}
+{%  block content %}
+	<div class="container">
+		<h1>Update answer</h1>
+		<form class="form-label" action='{{ url_for('route_edit_answer', answer_id=answer.answer_id, question_id=question.question_id) }}' method='POST'>
+		<br><br>
+        <label class="form-label" for="message">Answer:</label><br>
+        <textarea class="form-label" name="message" id="message" minlength="10" maxlength="600" rows="6" cols="100" >{{ answer.message }}</textarea>
+		<br>
+		<input class="btn btn-primary" type="submit" value="submit">
+	</form>
+	</div>
+{% endblock %}
+
+

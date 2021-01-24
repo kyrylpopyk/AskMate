@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Add question{% endblock %}
+{% block head %}{{ super() }}{% endblock %}
+{% block content %}
+		{% macro question_input(action="", value="", textarea="") %}
+		<div class="container mb-3">
+			<h1>Ask question</h1>
+			<div class="modal-body">
+				<form class="form-label" action="{{ action }}" method='POST' enctype="multipart/form-data">
+					<div class="mb-3">
+						<label for="title" class="col-form-label">Title</label>
+						<input type="text" class="form-control" name="title" id="title" value= "{{ value }} " required>
+					</div>
+					<div class="mb-3">
+						<label for="message" class="col-form-label">Message:</label>
+						<textarea class="form-control" name="message" id="message" rows="10" required>{{ textarea }}</textarea>
+					</div>
+					<div class="modal-footer">
+						<label for="question_image" class="form-control-file">Image (optional max 3MB) </label>
+						<input type="file" name="file" id="file" accept="image/*">
+						<input class="btn btn-primary" type="submit" value="submit">
+					</div>
+				</form>
+			</div>
+		</div>
+		{% endmacro %}
+
+	{% if question == None %}
+		{{ question_input(action=url_for('route_add_question'), value="", textarea="" ) }}
+	{% else %}
+		{{ question_input(action=url_for('route_edit_question', question_id=question.id), value=question.title, textarea=question.message ) }}
+	{% endif %}
+{% endblock %}

@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en-EN">
+<head>
+	{%- block head %}
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta name="description" content="AskMate">
+		<link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
+		<title>{% block title %}{% endblock %} - AskMate</title>
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+		<style>
+            html {
+                font-size: 14px;
+            }
+		</style>
+	{% endblock -%}
+</head>
+<body>
+{# navbar #}
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+	<div class="container">
+		<a class="navbar-brand" href="{{ url_for('route_list') }}">AskMate?</a>
+		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+		<div class="collapse navbar-collapse" id="navbarCollapse">
+			<form class="d-flex w-100" action="#">
+				<input class="form-control ms-5 me-2" name="search_phrase" id="search_phrase" type="search" placeholder="search.." aria-label="Search">
+				<button class="btn btn-outline-light" type="submit">Search</button>
+			</form>
+			<div class="navbar-nav">
+{#				{%- if current_user.is_authenticated %}#}
+					<a class="nav-item nav-link" href="#">Account</a>
+					<a class="nav-item nav-link" href="#">Logout</a>
+{#				{% else %}#}
+					<a class="nav-item nav-link" href="#">Login</a>
+{#				{% endif -%}#}
+			</div>
+		</div>
+	</div>
+</nav>
+<br>
+{# flash messages #}
+<main class="container">
+	<div class="row">
+		<div class="col">
+			<div class="container">
+				<div class="row justify-content-center">
+					<div class="row  w-50 text-center">
+						{%- with messages = get_flashed_messages(with_categories=true) %}
+							{%- if messages %}
+								{%- for category, message in messages %}
+									<div class="alert alert-{{ category }}">
+										{{ message }}</div>
+								{%- endfor %}
+							{% endif %}
+						{% endwith -%}
+					</div>
+				</div>
+			</div>
+			{%- block content -%}
+			{% endblock -%}
+		</div>
+		{#	sidebar #}
+		{% include 'sidebar.html' ignore missing %}
+	</div>
+</main>
+<br><br>
+<footer class="footer mt-auto py-3 bg-light">
+	<div class="container">
+		<span class="text-muted">&#169 2021 AskMate?</span>
+	</div>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js" integrity="sha384-q2kxQ16AaE6UbzuKqyBE9/u/KzioAlnx2maXQHiDX9d4/zp8Ok3f+M7DPm+Ib6IU" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.min.js" integrity="sha384-pQQkAEnwaBkjpqZ8RU1fF1AKtTcHJwFl3pblpTlHXybJjHpMYo79HY3hIi4NKxyj" crossorigin="anonymous"></script>
+</body>
+</html>

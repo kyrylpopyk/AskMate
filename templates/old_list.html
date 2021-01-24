@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block head %}
+	{{ super() }}
+{% endblock %}
+{% block title %}Questions{% endblock %}
+{% block content %}
+	<br>
+	<br>
+	<div class="container">
+		<table class="table table-borderless">
+			<thead>
+			<tr>
+				{% for header in (questions[0].keys()| list)[1:5] -%}
+					<th class="border-bottom border-dark">{{ header }}<a class="text-decoration-none" href="{{ url_for('route_list', order_by=header, order_direction=asc_desc) }}">
+						<i class="fas fa-sort" style="alignment: center"></i></a></th>
+				{% endfor %}
+			</tr>
+			</thead>
+
+			<tbody>
+			{%- for question in questions %}
+				<tr>
+					{%- for key in (questions[0].keys()| list)[1:5] %}
+						{%- if key == 'title' -%}
+							<td>
+								<a class="text-primary fw-bold text-decoration-none" href="{{ url_for('route_question', question_id=question.id,  questions_views=1) }}">{{ question[key]|truncate(100, True, '...') }}</a>
+							</td>
+						{%- elif key == 'time' -%}
+							<td><small>{{ question[key].strftime('%y-%m-%d') }}</small></td>
+						{%- else %}
+							<td>{{ question[key] }}</td>
+						{% endif -%}
+					{%- endfor -%}
+				</tr>
+				<td class="border-bottom" colspan="4">{{ question.message|truncate(250, True, '...') }}</td>
+			{%- endfor -%}
+			</tbody>
+		</table>
+	</div>
+{% endblock -%}
+

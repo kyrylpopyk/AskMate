@@ -1,0 +1,267 @@
+{% extends 'base.html' %}
+{% block title %}Question{% endblock %}
+{% block head %}{{ super() }}{% endblock %}
+{% block content %}
+
+	{% macro add_comment(action="", comment_for="") %}
+
+		<form class="row" action="{{ action }}" method="post">
+			<div class="col-8">
+				<label for="{{ comment_for }}" class="visually-hidden">comment_for</label>
+				<input type="text" class="form-control" name="{{ comment_for }}" id="{{ comment_for }}" placeholder="add comment">
+			</div>
+			<div class="col-2">
+				<button type="submit" class="btn btn-primary">post</button>
+			</div>
+		</form>
+	{% endmacro %}
+
+	{# breadcrumbs#}
+	<div class="container">
+		<div class="breadcrumbs">
+			<section class="container">
+				<div class="row">
+					<nav aria-label="breadcrumb">
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item"><a href="{{ url_for('route_list') }}">Home</a></li>
+							<li class="breadcrumb-item active" aria-current="page">{{ question.title }}</li>
+						</ol>
+					</nav>
+                </div>
+			</section>
+		</div>
+	</div>
+	<br><br>
+	<section> {#question title and message #}
+		<div class="container">
+			<div class="row">
+				<div class="row">
+					<div class="col-lg-8 fs- fw-bold">{{ question.title }}</div>
+				</div>
+				<div class="col-md-3">
+					{% if question.image %}
+                        <img src="{{ url_for('static', filename='img/'+question.image) }}" class="img-fluid" alt="pic">
+					{% else %}
+						<img src="{{ url_for('static', filename='img/default.png') }}" class="img-fluid w-75" alt="pic">
+					{% endif %}
+				</div>
+				<div class="col-xxl">
+					<div class="card-body">
+						<p>{{ question.message }}</p>
+						<hr>
+						<div class="row mt-0">
+							<div class="col-sm">
+								<small class="text-muted">updated {{ question.submission_time }}</small>
+							</div>
+							<div class="col-sm">
+								<small class="text-muted">score: {{ question.vote_number }} votes</small>
+							</div>
+							<div class="col-sm">
+								<a href="{{ url_for('route_question', question_id=question.id, questions_votes=+1) }}"><i class="far fa-thumbs-up btn btn-outline-success"></i></a>&nbsp;&nbsp;
+								<a href="{{ url_for('route_question', question_id=question.id, questions_votes=-1) }}"><i class="far fa-thumbs-down btn btn-outline-danger"></i></a>
+							</div>
+							<div class="col-sm text-end">
+								<a href="{{ url_for('route_edit_question', question_id=question.id) }}">
+									<button type="button" class="btn btn-outline-primary btn-sm">edit</button>
+								</a>
+								<button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirm_delete_question">
+									delete
+								</button>
+							</div>
+							{% if comments_for_question %}
+								<div class="container mt-3">
+									<p>
+										<button class="btn-sm btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_comment" aria-expanded="false" aria-controls="collapse_comment">
+											comments&nbsp;<span class="badge bg-secondary">{{ comments_for_question|length }}</span>
+										</button>
+									</p>
+									<div class="collapse" id="collapse_comment">
+										<div class="card card-body">
+											<table class="table">
+												<tbody>
+												{% for comment in comments_for_question %}
+													<tr>
+														<td>{{ comment.message }}</td>
+														<td>
+															<small class="text-muted"><a class="text-decoration-none" href="#">nickname</a></small>
+														</td>
+													</tr>
+												{% endfor %}
+												</tbody>
+											</table>
+                                            <br>{{ add_comment(action=url_for('route_add_comment_for_question', question_id=question.id), comment_for="comments_for_question") }}
+										</div>
+									</div>
+								</div>
+							{% else %}
+                                <br><br>{{ add_comment(action=url_for('route_add_comment_for_question', question_id=question.id), comment_for="comments_for_question") }}
+                            {% endif %}
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<br><br>
+		{#	Modal confirm delete question #}
+		<div class="modal fade" id="confirm_delete_question" tabindex="-1" aria-labelledby="confirm_deleteLabel"
+		     aria-hidden="true">
+			<div class="modal-dialog modal-sm">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="confirm_deleteLabel">Confirm delete</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<a href="{{ url_for('route_question', question_id=question.id, remove_question=True) }}">
+							<button type="button" class="btn btn-danger btn-sm">delete</button>
+						</a>
+						<button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">close</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<br>
+	</section> {# end question #}
+	<br>
+	<section> {# Answers #}
+		<div class="container border-bottom pb-2 fs-3">
+			{% set count_answers = answers|count %}
+			{% if count_answers == 1 %}
+				{{ count_answers }} answer
+			{% else %}
+				{{ count_answers }} answers
+			{% endif %}
+		</div>
+		<br>
+		{%- for answer in answers %}
+			<div class="container border mb-2">
+				<div class="row ">
+					<div class="col-md-1">
+						<div class="row mt-3"><p class="text-center">
+							<a href="{{ url_for('route_question', question_id=question.id, answers_votes=+1, answer_id=answer.id) }}"><i class="fas fa-chevron-up"></i></a>
+						</p></div>
+						<div><p class="text-center">
+							{% set vote_number = answer.vote_number %}
+							{% if answer.vote_number >= 1 %}
+								+{{ answer.vote_number }}
+							{% else %}
+								{{ answer.vote_number }}
+							{% endif %}
+						</p></div>
+						<div class="row mb-3"><p class="text-center">
+							<a href="{{ url_for('route_question', question_id=question.id, answers_votes=-1, answer_id=answer.id) }}"><i class="fas fa-chevron-down"></i></a>
+						</p></div>
+					</div>
+					<div class="col-xxl">
+						<div class="card-body">
+							<p>{{ answer.message }}</p>
+                                {% set answer_comments = comments_for_answers(answer.id|int) %}
+							{% if answer_comments %}
+								<table class="table text-muted">
+									<tbody>
+									{% for comment in answer_comments %}
+										<tr>
+											<td class="border-bottom-0" style="font-size: small">{{ comment.message }} -
+												<small style="font-size: small" class="text-muted"><a class="text-decoration-none" href="#">nickname</a></small>
+											</td>
+										</tr>
+									{% endfor %}
+									<tr>
+										<td>
+											{#action="{{ url_for('route_add_comment_for_answer', answer_id=answer.id) }}" >#}
+											{{ add_comment(action=url_for('route_add_comment_for_answer', answer_id=answer.id, question_id=question.id), comment_for="comments_for_answer") }}
+										</td>
+									</tr>
+									</tbody>
+								</table>
+							{% else %}
+								{{ add_comment(action=url_for('route_add_comment_for_answer', answer_id=answer.id, question_id=question.id), comment_for="comments_for_answer") }}
+
+							{% endif %}
+							<hr>
+							<div class="row mt-0">
+								<div class="col-sm">
+									<small class="text-muted">updated {{ answer.submission_time }}</small>
+								</div>
+								<div class="col-sm text-end">
+									<button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#update_answer">
+										edit
+									</button>
+									<button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirm_delete_answer">
+										delete
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			</section>
+			<section> {# Modal confirm delete answer#}
+				<div class="modal fade" id="confirm_delete_answer" tabindex="-1" aria-labelledby="confirm_deleteLabel" aria-hidden="true">
+					<div class="modal-dialog modal-sm">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title" id="confirm_deleteLabel">Confirm delete</h5>
+								<button type="button" class="btn-close" data-bs-dismiss="modal"
+								        aria-label="Close"></button>
+							</div>
+							<div class="modal-body">
+								<a href="{{ url_for('route_question', question_id=question.id, answer_id=answer.id, remove_answer=True) }}">
+									<button type="button" class="btn btn-danger btn-sm">delete</button>
+								</a>
+								<button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">close
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				{# Modal update answer#}
+				<div class="modal fade" id="update_answer" tabindex="-1" aria-labelledby="update_answerLabel"
+				     aria-hidden="true">
+					<div class="modal-dialog modal-xl">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title" id="update_answerLabel">Update answer</h5>
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+							</div>
+							<div class="modal-body">
+								<form class="form-label"
+								      action='{{ url_for('route_edit_answer', answer_id=answer.id, question_id=question.id) }}'
+								      method='POST'>
+									<div class="mb-3">
+										<label for="message" class="col-form-label">Message:</label>
+										<textarea class="form-control" name="message" id="message"
+										          rows="10">{{ answer.message }}</textarea>
+									</div>
+									<div class="modal-footer">
+										<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close
+										</button>
+										<input class="btn btn-primary" type="submit" value="submit">
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section> {# end answers #}
+		{% endfor %}
+	<br>
+	<section>{# Add new answer#}
+		<div class="container">
+			<div class="modal-body">
+				<form class="form-label" action='{{ url_for('route_question', question_id=question.id) }}' method='POST'>
+					<br><br>
+					<div class="mb-3">
+						<label class="form-label fw-bold" for="message">post answer:</label><br>
+						<textarea class="form-control" name="message" id="message" minlength="10" maxlength="600"
+						          rows="6"></textarea>
+					</div>
+					<div class="footer">
+						<input class="btn btn-primary" type="submit" value="submit">
+					</div>
+				</form>
+			</div>
+		</div>
+	</section>
+{% endblock %}
