@@ -45,7 +45,24 @@
 	</div>
 {% endmacro %}
 
-
+{# question add and edit macro #}
+{% macro macro_question_input(action="", info="", title="", message="", tag_name="", image="", hidden_tag="", submit="") %}
+	<div class="container mb-3">
+		<h1>{{ info }} question</h1>
+		<div class="modal-body">
+			<form class="form-label" action="{{ action }}" method='POST' enctype="multipart/form-data">
+				{{ hidden_tag }}
+				{{ macro_render_field(title) }}
+				{{ macro_render_field(message, rows=10) }}
+				<div class="modal-footer">
+					{{ macro_render_select_field(tag_name, class='form-select-sm') }}
+					{{ macro_upload_picture(image) }}
+					{{ submit(class="btn btn-primary my-2") }}
+				</div>
+			</form>
+		</div>
+	</div>
+{% endmacro %}
 
 {# answer or answers  plural/singular #}
 {%- macro macro_answer_pl_sg(count_it='') -%}

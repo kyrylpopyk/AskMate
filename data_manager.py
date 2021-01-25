@@ -335,6 +335,18 @@ def get_answers_id_by_question(cursor: RealDictCursor, question_id: int):
     cursor.execute(query, param)
     return cursor.fetchall()
 
+def fetch_tags():
+    return
+
+@connection.connection_handler
+def fetch_tags(cursor: RealDictCursor) -> list:
+    query = """SELECT id AS tag_id, name AS tag_name FROM tag"""
+    cursor.execute(query)
+    tags =  cursor.fetchall()
+    return list(tags)
+
+
+
 
 
 # --------------------------------------------------------------------------------------- AskMate v.1
