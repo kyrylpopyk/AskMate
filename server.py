@@ -1,5 +1,4 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
-# from flask_login import login_user, current_user, logout_user, login_required, LoginManager
 from util import os
 from werkzeug.utils import secure_filename
 from forms import RegistrationForm, LoginForm
@@ -14,9 +13,7 @@ app.config.update(
     UPLOAD_EXTENSIONS=['.jpg', '.png', '.jpeg'],
     UPLOAD_PATH='static/img')
 
-# login_manager = LoginManager(app)
-# login_manager.login_view = 'route_login'
-# login_manager.login_message_category = 'info'
+
 
 
 def save_image(file_ext, img, img_name):
@@ -41,6 +38,7 @@ def too_large(e):
 
 @app.route("/register", methods=['GET', 'POST'])
 def route_register():
+    print(request.form)
     form = RegistrationForm()
 
     return render_template('register.html', form=form)
@@ -48,6 +46,7 @@ def route_register():
 
 @app.route("/login", methods=['GET', 'POST'])
 def route_login():
+    print(request.form)
     form = LoginForm()
 
     return render_template('login.html', form=form)
