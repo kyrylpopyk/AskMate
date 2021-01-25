@@ -1,3 +1,69 @@
+{# render wtf fields vith validartion  #}
+{% macro macro_render_field(field) %}
+	<div class="form-label">
+		{{ field.label(class="form-control-label mt-2") }}
+		{% if field.errors %}
+			{{ field(class="form-control is-invalid") }}
+			<div class="invalid-feedback">
+				{% for error in field.errors %}
+					<span>{{ error }}</span>
+				{% endfor %}
+			</div>
+		{% else %}
+			{{ field(class="form-control", **kwargs)|safe }}
+		{% endif %}
+	</div>
+{% endmacro %}
+
+{# upload picture button #}
+{% macro macro_upload_picture(field) %}
+	{{ field.label }}
+	{% if field.errors %}
+		{{ field(class="form-control-file mb-2") }}
+		{% for error in field.errors %}<br>
+			<span class="text-danger">{{ error }}</span>
+		{% endfor %}
+	{% else %}
+		{{ field(class="form-control-label mt-2", accept="image/*") }}
+	{% endif %}
+{% endmacro %}
+
+{# render wtf fields with validartion  #}
+{% macro macro_render_select_field(field) %}
+	<div class="input-group w-25">
+		{{ field.label(class="input-group-text") }}
+		{% if field.errors %}
+			{{ field(class="form-control is-invalid") }}
+			<div class="invalid-feedback">
+				{% for error in field.errors %}
+					<span>{{ error }}</span>
+				{% endfor %}
+			</div>
+		{% else %}
+			{{ field(class="form-control", **kwargs)|safe }}
+		{% endif %}
+	</div>
+{% endmacro %}
+
+{# question add and edit macro #}
+{% macro macro_question_input(action="", info="", title="", message="", tag_name="", image="", hidden_tag="", submit="") %}
+	<div class="container mb-3">
+		<h1>{{ info }} question</h1>
+		<div class="modal-body">
+			<form class="form-label" action="{{ action }}" method='POST' enctype="multipart/form-data">
+				{{ hidden_tag }}
+				{{ macro_render_field(title) }}
+				{{ macro_render_field(message, rows=10) }}
+				<div class="modal-footer">
+					{{ macro_render_select_field(tag_name, class='form-select-sm') }}
+					{{ macro_upload_picture(image) }}
+					{{ submit(class="btn btn-primary my-2") }}
+				</div>
+			</form>
+		</div>
+	</div>
+{% endmacro %}
+
 {# answer or answers  plural/singular #}
 {%- macro macro_answer_pl_sg(count_it='') -%}
 	{%- set count_answers =  count_it -%}

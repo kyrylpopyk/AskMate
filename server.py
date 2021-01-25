@@ -1,7 +1,7 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
-
+from flask import Flask, render_template, request, redirect, url_for, flash, session
 from util import os
 from werkzeug.utils import secure_filename
+from forms import RegistrationForm, LoginForm, QuestionForm
 import data_manager
 
 app = Flask(__name__)
@@ -34,6 +34,30 @@ def too_large(e):
     return redirect(url_for('route_add_question', )), 413, {"Refresh": "0; url=/add-question"}
 
 
+@app.route("/register", methods=['GET', 'POST'])
+def route_register():
+    print(session)
+    print(request.form)
+    form = RegistrationForm()
+
+    return render_template('register.html', form=form)
+
+
+@app.route("/login", methods=['GET', 'POST'])
+def route_login():
+    print(request.form)
+    print(session)
+    form = LoginForm()
+
+    return render_template('login.html', form=form)
+
+
+@app.route("/logout")
+def route_logout():
+    # logout_user()
+    return redirect(url_for('route_list'))
+
+
 @app.route("/")
 @app.route("/list", methods=['GET'])
 def route_list(order_by=data_manager.DEFAULT_ORDER_BY, order_direction=data_manager.DEFAULT_ORDER_DIR):
@@ -45,15 +69,13 @@ def route_list(order_by=data_manager.DEFAULT_ORDER_BY, order_direction=data_mana
     return render_template('list.html', questions=questions, asc_desc=switch_order_direction)
 
 
-@app.route('/update')
-def route_update():
-    return render_template('update.html')
-
-
 @app.route('/add-question', methods=['GET', 'POST'])
 def route_add_question():
     if request.method == 'GET':
-        return render_template("add_question.html", question=None)
+
+        tags = data_manager.fetch_tags()
+
+        return render_template("add_question.html", question=None, tags=tags)
 
     new_question_all_data = data_manager.add_question()
     img = request.files['file']
@@ -87,10 +109,11 @@ def route_edit_question(question_id):
     question = data_manager.find_question_by_id(question_id=question_id)
 
     if question == None:
-        return render_template('404.html')
+        return redirect(url_for('route_list'))
 
     if request.method == 'GET':
-        return render_template('add_question.html', question=list(question)[0])
+        tags = data_manager.fetch_tags()
+        return render_template('add_question.html', question=list(question)[0], tags=tags)
 
     elif request.method == 'POST':
         img = request.files['file']
