@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileAllowed, FileField
-from flask_login import current_user
+from flask import session
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, SelectField, IntegerField
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
@@ -17,9 +17,9 @@ class RegistrationForm(FlaskForm):
     submit = SubmitField('Sign Up')
 
     # def validate_email(self, email):
-    #     find email in dadabase
-    #     if user:
-    #         raise ValidationError('That email is taken. Choose a different one.')
+        # find email in dadabase
+        # if user:
+        #     raise ValidationError('That email is taken. Choose a different one.')
 
 
 class UpdateAccountForm(FlaskForm):
@@ -30,7 +30,7 @@ class UpdateAccountForm(FlaskForm):
     submit = SubmitField('Update')
 
     # def validate_email(self, email):
-    #     if email.data != current_user.email:
+    #     if email.data != session.email:
     #         # find username by email
     #         if user:
     #             raise ValidationError('That email is taken. Please choose a different one.')

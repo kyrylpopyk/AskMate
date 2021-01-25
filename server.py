@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, session
 from util import os
 from werkzeug.utils import secure_filename
 from forms import RegistrationForm, LoginForm
@@ -38,6 +38,7 @@ def too_large(e):
 
 @app.route("/register", methods=['GET', 'POST'])
 def route_register():
+    print(session)
     print(request.form)
     form = RegistrationForm()
 
@@ -47,6 +48,7 @@ def route_register():
 @app.route("/login", methods=['GET', 'POST'])
 def route_login():
     print(request.form)
+    print(session)
     form = LoginForm()
 
     return render_template('login.html', form=form)
