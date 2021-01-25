@@ -82,7 +82,7 @@
 				<div class="col-10  fw-bold text-start">
 					<span class="badge bg-success">{{ macro_votes(question_votes=item.votes) }}</span>&nbsp;
 					<a class="text-decoration-none" href="{{ url_for('route_question', question_id=item.id,  questions_views=1) }}">{{ macro_heihlight_search_pharse(column=item.title, search_phrase=search_phrase) }}</a>
-					<span class="badge bg-primary"><a class="link-light text-decoration-none" href="#">tag</a></span>
+					<span class="badge bg-primary"><a class="link-light text-decoration-none" href="#">{{ item.tag }}</a></span>
 				</div>
 				<ul class="col-2 list-inline text-end mb-0">
 					<li class="list-inline-item">

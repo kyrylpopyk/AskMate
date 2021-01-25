@@ -35,13 +35,18 @@ def remove_question(cursor: RealDictCursor, question_id: int) -> None:
 @connection.connection_handler
 def get_questions_data(cursor: RealDictCursor, asc_desc: str, sort_column_by: str) -> dict:
     query = """ 
-    select 
-    id,
-    title as "title", 
-    submission_time as "time", 
-    view_number as "views", 
-    vote_number as "votes", 
-    message from question
+    select
+    question.id,
+    title as "title",
+    submission_time as "time",
+    view_number as "views",
+    vote_number as "votes",
+    message, tag.name as tag
+    from question
+    INNER JOIN question_tag
+    on question_tag.question_id = question.id
+    inner join tag
+    on tag.id = question_tag.tag_id
     order by {0} {1};
     """.format(sort_column_by, asc_desc)
     parameter = {'asc_desc': asc_desc, 'sort_column_by': sort_column_by}
