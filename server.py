@@ -13,6 +13,10 @@ app.config.update(
     UPLOAD_EXTENSIONS=['.jpg', '.png', '.jpeg'],
     UPLOAD_PATH='static/img')
 
+app.jinja_env.globals.update(
+    func_tags=data_manager.count_tags
+)
+
 
 def save_image(file_ext, img, img_name):
     if file_ext in app.config['UPLOAD_EXTENSIONS']:
@@ -65,7 +69,12 @@ def route_list(order_by=data_manager.DEFAULT_ORDER_BY, order_direction=data_mana
         order_by = request.args.get('order_by')
         order_direction = request.args.get('order_direction')
     switch_order_direction = data_manager.switch_asc_desc(order_direction=order_direction)
-    questions = data_manager.get_questions_data(sort_column_by=order_by, asc_desc=order_direction)
+    questions = []
+    if 'tag_id' in request.args:
+        questions = data_manager.get_questions_data_by_tag(
+            sort_column_by=order_by, asc_desc=order_direction, tag_id=request.args['tag_id'])
+    else:
+        questions = data_manager.get_questions_data(sort_column_by=order_by, asc_desc=order_direction)
     return render_template('list.html', questions=questions, asc_desc=switch_order_direction)
 
 
@@ -77,6 +86,7 @@ def route_add_question():
 
         return render_template("add_question.html", question=None, tags=tags)
 
+    data = request.form
     new_question_all_data = data_manager.add_question()
     img = request.files['file']
     img_name = img.filename
@@ -95,7 +105,8 @@ def route_add_question():
         {
             "title": request.form.get('title'),
             "message": request.form.get('message'),
-            "image": img_name
+            "image": img_name,
+            "tag_id": request.form.get('tag_name')
         }
     )
 

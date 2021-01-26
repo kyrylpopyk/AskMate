@@ -22,7 +22,7 @@
 							<select class="form-select-sm" id="tag_name" name="tag_name" required>
 								<option selected value="__None"></option>
 									{% for tag in tags %}
-								<option value={{ tag.tag_i }}d>{{ tag.tag_name }}</option>
+								<option value={{ tag.tag_id }}>{{ tag.tag_name }}</option>
 							{% endfor %}
 							</select>
 						</div>

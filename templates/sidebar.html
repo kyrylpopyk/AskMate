@@ -2,8 +2,8 @@
 	<a class="btn btn-outline-primary my-3" href="{{ url_for('route_add_question') }}" role="button">Ask question</a>
 	<p class="fw-bold my-1">Tags</p>
 	<div class="list-group">
-		{%- for tag in func_tags -%}
-			<a href="{{ url_for('route_list', tag_id=tag.tag_id) }}" class="d-flex link-secondary text-decoration-none justify-content-between align-items-center my-1">#{{ tag.tag_name }}<span class="badge bg-primary rounded-pill">{{ tag.count }}</span></a>
+		{%- for tag in func_tags() -%}
+			<a href="{{ url_for('route_list', tag_id=tag.tag_id) }}" class="d-flex link-secondary text-decoration-none justify-content-between align-items-center my-1 btn ">{{ tag.tag_name }}<span class="badge bg-primary rounded-pill">{{ tag.count }}</span></a>
 		{% endfor -%}
 	</div>
 </aside>

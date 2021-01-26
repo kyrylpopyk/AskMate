@@ -9,7 +9,6 @@ import connection
 DEFAULT_ORDER_BY = 'submission_time'
 DEFAULT_ORDER_DIR = 'DESC'
 
-
 @connection.connection_handler
 def remove_question(cursor: RealDictCursor, question_id: int) -> None:
     answers_id = get_answers_id_by_question(question_id=question_id)
@@ -38,19 +37,47 @@ def get_questions_data(cursor: RealDictCursor, asc_desc: str, sort_column_by: st
     select
     question.id,
     title as "title",
-    submission_time as "time",
+    question.submission_time as "time",
     view_number as "views",
-    vote_number as "votes",
-    message, tag.name as tag
+    question.vote_number as "votes",
+    question.message, tag.name as tag,
+    count(answer.message) as answers_count
     from question
     INNER JOIN question_tag
     on question_tag.question_id = question.id
     inner join tag
     on tag.id = question_tag.tag_id
-    order by {0} {1};
+    left join answer
+    on answer.question_id = question.id
+    group by question.id, tag.name
+    order by question.{0} {1};
     """.format(sort_column_by, asc_desc)
     parameter = {'asc_desc': asc_desc, 'sort_column_by': sort_column_by}
     cursor.execute(query, parameter)
+    return cursor.fetchall()
+
+@connection.connection_handler
+def get_questions_data_by_tag(cursor: RealDictCursor, asc_desc: str, sort_column_by: str, tag_id: int) -> dict:
+    query = """ 
+    select
+    question.id,
+    title as "title",
+    question.submission_time as "time",
+    view_number as "views",
+    question.vote_number as "votes",
+    question.message, tag.name as tag,
+    count(answer.message) as answers_count
+    from question
+    INNER JOIN question_tag
+    on question_tag.question_id = question.id and question_tag.tag_id = {2}
+    inner join tag
+    on tag.id = question_tag.tag_id
+    left join answer
+    on answer.question_id = question.id
+    group by question.id, tag.name
+    order by question.{0} {1};
+    """.format(sort_column_by, asc_desc, tag_id)
+    cursor.execute(query)
     return cursor.fetchall()
 
 
@@ -247,14 +274,16 @@ def add_question():
 @connection.connection_handler
 def save_question(cursor, data):
     cursor.execute("""INSERT INTO question VALUES (%(new_id_value)s, %(new_submission_time_value)s, %(new_view_number_value)s, 
-                    %(new_vote_number_value)s, %(new_title_value)s, %(new_message_value)s, %(new_image_value)s);""",
+                    %(new_vote_number_value)s, %(new_title_value)s, %(new_message_value)s, %(new_image_value)s);
+                    INSERT INTO question_tag VALUES (%(new_id_value)s, %(tag_id)s)""",
                    {"new_id_value": data['id'],
                     "new_submission_time_value": data['submission_time'],
                     "new_view_number_value": data['view_number'],
                     "new_vote_number_value": data['vote_number'],
                     "new_title_value": data['title'],
                     "new_message_value": data['message'],
-                    "new_image_value": data['image']})
+                    "new_image_value": data['image'],
+                    "tag_id": data['tag_id']})
 
 
 @connection.connection_handler
@@ -351,6 +380,16 @@ def fetch_tags(cursor: RealDictCursor) -> list:
     return list(tags)
 
 
+@connection.connection_handler
+def count_tags(cursor: RealDictCursor) -> list:
+    query = """
+    SELECT tag.name as tag_name, count(question_tag.tag_id) as count, tag.id as tag_id
+    from tag, question_tag
+    where tag_id = tag.id
+    group by tag.name, tag.id;
+    """
+    cursor.execute(query)
+    return cursor.fetchall()
 
 
 
