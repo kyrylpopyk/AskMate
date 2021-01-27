@@ -41,8 +41,11 @@ def get_questions_data(cursor: RealDictCursor, asc_desc: str, sort_column_by: st
     view_number as "views",
     question.vote_number as "votes",
     question.message, tag.name as tag,
-    count(answer.message) as answers_count
+    count(answer.message) as answers_count,
+    count(comment.message) as comments_count
     from question
+    left join comment
+    on question.id = comment.question_id
     INNER JOIN question_tag
     on question_tag.question_id = question.id
     inner join tag
@@ -66,8 +69,11 @@ def get_questions_data_by_tag(cursor: RealDictCursor, asc_desc: str, sort_column
     view_number as "views",
     question.vote_number as "votes",
     question.message, tag.name as tag,
-    count(answer.message) as answers_count
+    count(answer.message) as answers_count,
+    count(comment.message) as comments_count
     from question
+    left join comment
+    on question.id = comment.question_id
     INNER JOIN question_tag
     on question_tag.question_id = question.id and question_tag.tag_id = {2}
     inner join tag
@@ -386,10 +392,19 @@ def count_tags(cursor: RealDictCursor) -> list:
     SELECT tag.name as tag_name, count(question_tag.tag_id) as count, tag.id as tag_id
     from tag, question_tag
     where tag_id = tag.id
-    group by tag.name, tag.id;
+    group by tag.name, tag.id
+    order by tag.name;
     """
     cursor.execute(query)
     return cursor.fetchall()
+@connection.connection_handler
+def count_questions(cursor: RealDictCursor) -> int:
+    query = """
+    SELECT count(question.id) as questions_count
+    from question;
+    """
+    cursor.execute(query)
+    return cursor.fetchall()[0]['questions_count']
 
 
 

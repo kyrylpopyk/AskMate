@@ -14,7 +14,8 @@ app.config.update(
     UPLOAD_PATH='static/img')
 
 app.jinja_env.globals.update(
-    func_tags=data_manager.count_tags
+    func_tags=data_manager.count_tags,
+    questions_count=data_manager.count_questions
 )
 
 

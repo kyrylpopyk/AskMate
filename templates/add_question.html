@@ -20,7 +20,7 @@
 						<div class="input-group w-25">
 							<label class="input-group-text" for="tag_name">tag</label>
 							<select class="form-select-sm" id="tag_name" name="tag_name" required>
-								<option selected value="__None"></option>
+								<option selected></option>
 									{% for tag in tags %}
 								<option value={{ tag.tag_id }}>{{ tag.tag_name }}</option>
 							{% endfor %}
