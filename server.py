@@ -19,6 +19,7 @@ app.jinja_env.globals.update(
 )
 
 
+
 def save_image(file_ext, img, img_name):
     if file_ext in app.config['UPLOAD_EXTENSIONS']:
         img.save(os.path.join(app.config['UPLOAD_PATH'], img_name))
@@ -66,17 +67,25 @@ def route_logout():
 @app.route("/")
 @app.route("/list", methods=['GET'])
 def route_list(order_by=data_manager.DEFAULT_ORDER_BY, order_direction=data_manager.DEFAULT_ORDER_DIR):
+    pagination_size = 20
     if request.args.get('order_by') is not None:
         order_by = request.args.get('order_by')
         order_direction = request.args.get('order_direction')
     switch_order_direction = data_manager.switch_asc_desc(order_direction=order_direction)
     questions = []
     if 'tag_id' in request.args:
+        last_tag_id = request.args['tag_id']
         questions = data_manager.get_questions_data_by_tag(
             sort_column_by=order_by, asc_desc=order_direction, tag_id=request.args['tag_id'])
     else:
         questions = data_manager.get_questions_data(sort_column_by=order_by, asc_desc=order_direction)
-    return render_template('list.html', questions=questions, asc_desc=switch_order_direction)
+    questions = data_manager.pagination(data=questions, pagination_range=20)
+    pagination_index = request.args['pagination_index'] if 'pagination_index' in request.args else 0
+
+    return render_template(
+        'list.html', questions=questions[int(pagination_index)], asc_desc=switch_order_direction,
+        pagination_count=len(questions)
+    )
 
 
 @app.route('/add-question', methods=['GET', 'POST'])
@@ -235,6 +244,7 @@ def route_add_comment_for_answer(question_id, answer_id):
         }
     data_manager.add_comment(new_comment)
     return redirect(url_for("route_question", question_id=question_id))
+
 
 
 if __name__ == '__main__':

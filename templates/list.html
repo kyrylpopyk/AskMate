@@ -6,7 +6,7 @@
 
 	{{ sort_bar(route="route_list", data=questions, order_direction=asc_desc, search_phrase="") }}
 
-	{{ macro_generate_question_list(item=question, the_list=questions, route='route_list', search_phrase='') }}
+	{{ macro_generate_question_list(item=question, the_list=questions, route='route_list', pagination_count=pagination_count, search_phrase='') }}
 
 
 	</div>

@@ -141,7 +141,8 @@
 {%- endmacro -%}
 
 {# generate list of questions#}
-{% macro macro_generate_question_list(item="", the_list="", route="", search_phrase='') %}
+{% macro macro_generate_question_list(item="", the_list="", route="", search_phrase='', pagination_count='', last_tag_id='') %}
+    {{ macro_pagination(pagination_count=pagination_count) }}
 	{% for item in the_list %}
 		<div class="card text-dark bg-light mt-3">
 			<div class="card-header d-flex">
@@ -177,5 +178,19 @@
 			</div>
 		</div>
 	{% endfor %}
+    {% if the_list|length > 6 %}
+        {{ macro_pagination(pagination_count=pagination_count) }}
+    {% endif %}
+
+{% endmacro %}
+
+{% macro macro_pagination(pagination_count='', last_tag_id='') %}
+    <nav aria-label="Page navigation example">
+      <ul class="pagination">
+        {% for index in range(pagination_count) %}
+            <li class="page-item"><a class="page-link" href={{ url_for('route_list', pagination_index = index, last_tag_id=last_tag_id) }}>{{ index + 1 }}</a></li>
+        {% endfor %}
+      </ul>
+    </nav>
 {% endmacro %}
 
