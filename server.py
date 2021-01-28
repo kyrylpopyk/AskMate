@@ -72,19 +72,33 @@ def route_list(order_by=data_manager.DEFAULT_ORDER_BY, order_direction=data_mana
         order_by = request.args.get('order_by')
         order_direction = request.args.get('order_direction')
     switch_order_direction = data_manager.switch_asc_desc(order_direction=order_direction)
+
     questions = []
-    if 'tag_id' in request.args:
+    last_tag_id = 'all'
+    last_pagination_index = 0
+
+    if 'last_tag_id' in request.args and request.args['last_tag_id'] != last_tag_id:
+        last_tag_id = request.args['last_tag_id']
+        questions = data_manager.get_questions_data_by_tag(
+            sort_column_by=order_by, asc_desc=order_direction, tag_id=str(last_tag_id))
+    elif 'tag_id' in request.args:
         last_tag_id = request.args['tag_id']
         questions = data_manager.get_questions_data_by_tag(
             sort_column_by=order_by, asc_desc=order_direction, tag_id=request.args['tag_id'])
     else:
         questions = data_manager.get_questions_data(sort_column_by=order_by, asc_desc=order_direction)
+        last_tag_id = 'all'
+
     questions = data_manager.pagination(data=questions, pagination_range=20)
-    pagination_index = request.args['pagination_index'] if 'pagination_index' in request.args else 0
+
+    if 'last_pagination_index' in request.args:
+        last_pagination_index = request.args['last_pagination_index']
+    else:
+        last_pagination_index = request.args['pagination_index'] if 'pagination_index' in request.args else 0
 
     return render_template(
-        'list.html', questions=questions[int(pagination_index)], asc_desc=switch_order_direction,
-        pagination_count=len(questions)
+        'list.html', questions=questions[int(last_pagination_index)], asc_desc=switch_order_direction,
+        pagination_count=len(questions), last_tag_id=last_tag_id, last_pagination_index=last_pagination_index
     )
 
 

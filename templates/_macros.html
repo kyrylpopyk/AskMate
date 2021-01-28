@@ -106,7 +106,7 @@
 {%- endmacro -%}
 
 {# sorting bar #}
-{% macro sort_bar(route="", data="", order_direction="", search_phrase="") %}
+{% macro sort_bar(route="", data="", order_direction="", search_phrase="", last_tag_id='', last_pagination_index='') %}
 	{%- if data.total == 0 %}
 		<div class="container mt-3">
 			<p>Your search - did not match any documents.</p>
@@ -131,7 +131,7 @@
 				<div class="col text-end">
 					<div class="btn-group" role="group" aria-label="Basic outlined">
 						{% for item, value in dict_sort_by.items() -%}
-							<a href="{{ url_for(route, page=data.page, order_by=value, order_direction=order_direction) }}" type="button" class="btn mt-0 btn-outline-primary">{{ item }}&nbsp;<i class="fas fa-sort"></i></a>
+							<a href="{{ url_for(route, page=data.page, order_by=value, order_direction=order_direction, last_tag_id=last_tag_id, last_pagination_index=last_pagination_index) }}" type="button" class="btn mt-0 btn-outline-primary">{{ item }}&nbsp;<i class="fas fa-sort"></i></a>
 						{% endfor -%}
 					</div>
 				</div>
@@ -142,7 +142,7 @@
 
 {# generate list of questions#}
 {% macro macro_generate_question_list(item="", the_list="", route="", search_phrase='', pagination_count='', last_tag_id='') %}
-    {{ macro_pagination(pagination_count=pagination_count) }}
+    {{ macro_pagination(pagination_count=pagination_count, last_tag_id=last_tag_id) }}
 	{% for item in the_list %}
 		<div class="card text-dark bg-light mt-3">
 			<div class="card-header d-flex">
@@ -179,7 +179,7 @@
 		</div>
 	{% endfor %}
     {% if the_list|length > 6 %}
-        {{ macro_pagination(pagination_count=pagination_count) }}
+        {{ macro_pagination(pagination_count=pagination_count, last_tag_id=last_tag_id) }}
     {% endif %}
 
 {% endmacro %}

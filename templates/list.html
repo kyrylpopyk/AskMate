@@ -4,9 +4,9 @@
 {% block content %}
 	<div class="container">
 
-	{{ sort_bar(route="route_list", data=questions, order_direction=asc_desc, search_phrase="") }}
+	{{sort_bar(route="route_list", data=questions, order_direction=asc_desc, search_phrase="", last_tag_id=last_tag_id, last_pagination_index=last_pagination_index) }}
 
-	{{ macro_generate_question_list(item=question, the_list=questions, route='route_list', pagination_count=pagination_count, search_phrase='') }}
+	{{ macro_generate_question_list(item=question, the_list=questions, route='route_list', pagination_count=pagination_count, search_phrase='', last_tag_id=last_tag_id) }}
 
 
 	</div>

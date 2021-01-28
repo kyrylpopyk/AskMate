@@ -421,6 +421,10 @@ def pagination(data: list, pagination_range: int = 10) -> list:
     return result
 
 
+def sort_questions(questions: list, sort_by: str, asc_desc: str):
+    return sorted(questions, key=lambda question: question[sort_by], reverse=True if asc_desc == 'asc' else False)
+
+
 
 
 # --------------------------------------------------------------------------------------- AskMate v.1
