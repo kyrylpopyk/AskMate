@@ -4,9 +4,11 @@
 {% block content %}
 	<div class="container">
 
-	{{sort_bar(route="route_list", data=questions, order_direction=asc_desc, search_phrase="", last_tag_id=last_tag_id, last_pagination_index=last_pagination_index) }}
+	{{sort_bar(route="route_list", data=questions, order_direction=asc_desc, search_phrase="", last_tag_id=last_tag_id, last_order_by=last_order_by)}}
 
-	{{ macro_generate_question_list(item=question, the_list=questions, route='route_list', pagination_count=pagination_count, search_phrase='', last_tag_id=last_tag_id) }}
+	{{ macro_generate_question_list(item=question, the_list=questions, route='route_list',
+	 pagination_count=pagination_count, search_phrase='', last_tag_id=last_tag_id, last_order_by=last_order_by,
+	 asc_desc=asc_desc) }}
 
 
 	</div>

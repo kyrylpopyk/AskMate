@@ -7,7 +7,7 @@ from psycopg2.extras import RealDictCursor
 import connection
 
 DEFAULT_ORDER_BY = 'submission_time'
-DEFAULT_ORDER_DIR = 'DESC'
+DEFAULT_ORDER_DIR = 'ASC'
 
 @connection.connection_handler
 def remove_question(cursor: RealDictCursor, question_id: int) -> None:
