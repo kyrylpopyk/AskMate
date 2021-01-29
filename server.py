@@ -3,6 +3,7 @@ from util import os
 from werkzeug.utils import secure_filename
 from forms import RegistrationForm, LoginForm, QuestionForm
 import data_manager
+import bcrypt
 
 app = Flask(__name__)
 app.url_map.strict_slashes = False
@@ -48,13 +49,13 @@ def route_register():
     return render_template('register.html', form=form)
 
 
-@app.route("/login", methods=['GET', 'POST'])
-def route_login():
-    print(request.form)
-    print(session)
-    form = LoginForm()
-
-    return render_template('login.html', form=form)
+# @app.route("/login", methods=['GET', 'POST'])
+# def route_login():
+#     print(request.form)
+#     print(session)
+#     form = LoginForm()
+#
+#     return render_template('login.html', form=form)
 
 
 @app.route("/logout")
@@ -235,6 +236,32 @@ def route_add_comment_for_answer(question_id, answer_id):
         }
     data_manager.add_comment(new_comment)
     return redirect(url_for("route_question", question_id=question_id))
+
+
+def verify_password(plain_password, hash_password):
+    hashed_byte_password = hash_password.encode("UTF-8")
+    return bcrypt.checkpw(plain_password.encode("UTF-8"), hashed_byte_password)
+
+
+@app.route("/login/", methods=["GET", "POST"])
+def login():
+    login_data = {}
+    if request.method == "POST":
+        login_data['email'] = request.form['email']
+        login_data['password'] = request.form['password']
+        user_check = data_manager.check_login(login_data['email'])
+        password_check = data_manager.check_password(login_data['email'])
+        if user_check == False or password_check == False:
+            message = 'Username or password is incorrect. Please try again.'
+            return render_template('login.html', message=message)
+        else:
+            flash("You are logged in!")
+            session['email'] = request.form['email']
+            return redirect(url_for("route_list"))
+    if 'username' in session:
+        return render_template("login.html", username=session["username"])
+    else:
+        return render_template("login.html")
 
 
 if __name__ == '__main__':

@@ -4,7 +4,7 @@
 {% block content %}
 	<div class="container">
 		<div class="row justify-content-center">
-			<form action="{{ url_for('route_login') }}" method="post" class="row w-50">
+			<form action="{{ url_for('login') }}" method="post" class="row w-50">
 				{{ form.hidden_tag() }}
 				<fieldset>
 					<legend class="border-bottom mb-4 text-center">Log In</legend>
@@ -17,6 +17,7 @@
 					</div>
 				</fieldset>
 				<div class="form-group">{{ form.submit(class="btn btn-primary my-2") }}</div>
+                <button type="submit" value = "test"></button>
 			</form>
 			<div class="border-top pt-2 mt-3">
 				<small class="text-muted">Need An Account? <a class="ml-2" href="{{ url_for('route_register') }}"> Sign Up</a></small>

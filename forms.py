@@ -8,8 +8,6 @@ from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationE
 # from askmate.data_manager import choice_query
 
 
-
-
 class RegistrationForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=4, max=20)])
     email = StringField('Email', validators=[DataRequired(), Email(), Length(max=120)])

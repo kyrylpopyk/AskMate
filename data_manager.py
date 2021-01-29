@@ -375,14 +375,16 @@ def get_answers_id_by_question(cursor: RealDictCursor, question_id: int):
     cursor.execute(query, param)
     return cursor.fetchall()
 
+
 def fetch_tags():
     return
+
 
 @connection.connection_handler
 def fetch_tags(cursor: RealDictCursor) -> list:
     query = """SELECT id AS tag_id, name AS tag_name FROM tag"""
     cursor.execute(query)
-    tags =  cursor.fetchall()
+    tags = cursor.fetchall()
     return list(tags)
 
 
@@ -397,6 +399,8 @@ def count_tags(cursor: RealDictCursor) -> list:
     """
     cursor.execute(query)
     return cursor.fetchall()
+
+
 @connection.connection_handler
 def count_questions(cursor: RealDictCursor) -> int:
     query = """
@@ -406,6 +410,44 @@ def count_questions(cursor: RealDictCursor) -> int:
     cursor.execute(query)
     return cursor.fetchall()[0]['questions_count']
 
+
+@connection.connection_handler
+def find_all_emails(cursor: RealDictCursor, email: str):
+    query = """
+    select * from users
+    where email = %(email)s
+    """
+    param = {'email': email}
+    cursor.execute(query, param)
+    return cursor.fetchall()
+
+
+@connection.connection_handler
+def check_login(cursor: RealDictCursor, email):
+    query = """
+    select email from users
+    where email = %(email)s
+    """
+    cursor.execute(query, {"email": email})
+    compare = cursor.fetchall()
+    if len(compare) == 0:
+        return False
+    else:
+        return True
+
+
+@connection.connection_handler
+def check_password(cursor: RealDictCursor, email):
+    query = """
+    select password from users
+    where email = %(email)s    
+    """
+    cursor.execute(query, {"email": email})
+    compare = cursor.fetchall()
+    if len(compare) == 0:
+        return False
+    else:
+        return True
 
 
 # --------------------------------------------------------------------------------------- AskMate v.1
