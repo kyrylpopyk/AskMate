@@ -65,7 +65,7 @@ def route_logout():
 
 
 @app.route("/")
-@app.route("/list", methods=['GET'])
+@app.route("/list", methods=['GET', 'POST'])
 def route_list(order_by=data_manager.DEFAULT_ORDER_BY, order_direction=data_manager.DEFAULT_ORDER_DIR):
     pagination_size = 20
     switch_order_direction = ''
@@ -104,14 +104,20 @@ def route_list(order_by=data_manager.DEFAULT_ORDER_BY, order_direction=data_mana
         questions = data_manager.get_questions_data(sort_column_by=order_by, asc_desc=switch_order_direction)
         last_tag_id = 'all'
 
-    questions = data_manager.pagination(data=questions, pagination_range=20)
-
+    is_search = False
+    if 'search_phrase' in request.form:
+        questions = data_manager.search_phrase(questions=questions, phrase=request.form.get('search_phrase'))
+        is_search = True
 
     pagination_index = request.args['pagination_index'] if 'pagination_index' in request.args else 0
 
+    pag_questions = (data_manager.pagination(data=questions, pagination_range=20))
+    questions = pag_questions[int(pagination_index)]
+
+
     return render_template(
-        'list.html', questions=questions[int(pagination_index)], asc_desc=switch_order_direction,
-        pagination_count=len(questions), last_tag_id=last_tag_id, last_order_by=order_by
+        'list.html', questions=questions, asc_desc=switch_order_direction,
+        pagination_count=len(pag_questions), last_tag_id=last_tag_id, last_order_by=order_by, is_search=is_search
     )
 
 

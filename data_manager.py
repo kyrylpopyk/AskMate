@@ -424,6 +424,43 @@ def pagination(data: list, pagination_range: int = 10) -> list:
 def sort_questions(questions: list, sort_by: str, asc_desc: str):
     return sorted(questions, key=lambda question: question[sort_by], reverse=True if asc_desc == 'asc' else False)
 
+def search_phrase(questions: list, phrase: str) -> list:
+    result = []
+
+    for question in questions:
+        ready_to_put, question['title'] = search_into_string(question['title'], phrase)
+        ready_to_put, question['message'] = search_into_string(question['message'], phrase)
+        if ready_to_put:
+            result.append(question)
+
+    return result
+
+def search_into_string(line: str,phrase: str):
+    mark_start = '<span class="bg-primary text-white">'
+    mark_end = '</span>'
+    phrase_count = 0
+    result = ''
+    ready_to_put = False
+
+    for element in line:
+        if element.lower() == str(phrase[phrase_count]).lower():
+            result += element
+            if result.lower() == phrase.lower():
+                #line = line.replace(result, mark_start + result + mark_end)
+                line = line.replace(result, '<span class="bg-primary text-white">%s</span>' % (result))
+                #"<div>" + getLink(text=_('Test'), fn.getUrl()) + "</div>"
+                phrase_count = 0
+                result = ''
+                ready_to_put = True
+            else:
+                phrase_count += 1
+        else:
+            phrase_count = 0
+            result = ''
+
+    return ready_to_put, line
+
+
 
 
 

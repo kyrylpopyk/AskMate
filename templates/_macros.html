@@ -141,14 +141,18 @@
 {%- endmacro -%}
 
 {# generate list of questions#}
-{% macro macro_generate_question_list(item="", the_list="", route="", search_phrase='', pagination_count='', last_tag_id='', last_order_by='', asc_desc='') %}
+{% macro macro_generate_question_list(item="", the_list="", route="", search_phrase='', pagination_count='', last_tag_id='', last_order_by='', asc_desc='', is_search='') %}
     {{ macro_pagination(pagination_count=pagination_count, last_tag_id=last_tag_id, last_order_by=last_order_by, asc_desc=asc_desc) }}
 	{% for item in the_list %}
 		<div class="card text-dark bg-light mt-3">
 			<div class="card-header d-flex">
 				<div class="col-10  fw-bold text-start">
 					<span class="badge bg-success">{{ macro_votes(question_votes=item.votes) }}</span>&nbsp;
-					<a class="text-decoration-none" href="{{ url_for('route_question', question_id=item.id,  questions_views=1) }}">{{ macro_heihlight_search_pharse(column=item.title, search_phrase=search_phrase) }}</a>
+                    {% if is_search %}
+					    <a class="text-decoration-none" href="{{ url_for('route_question', question_id=item.id,  questions_views=1) }}">{{ item.title |safe }}</a>
+                    {% else %}
+					    <a class="text-decoration-none" href="{{ url_for('route_question', question_id=item.id,  questions_views=1) }}">{{ item.title}}</a>
+                    {% endif %}
 					<span class="badge bg-primary"><a class="link-light text-decoration-none" href="#">{{ item.tag }}</a></span>
 				</div>
 				<ul class="col-2 list-inline text-end mb-0">
@@ -161,7 +165,11 @@
 			</div>
 			<div class="card-body pb-1">
 				<div class="row">
-					<p class="card-text">{{ macro_heihlight_search_pharse(column=item.message, search_phrase=search_phrase) }}</p>
+                    {% if is_search %}
+                        <p class="card-text">{{ item.message | safe }}</p>
+                    {% else %}
+                        <p class="card-text">{{ item.message }}</p>
+                    {% endif %}
 					<hr class="m-1">
 					<ul class="list-inline text-end mb-0">
 						<li class="list-inline-item">
