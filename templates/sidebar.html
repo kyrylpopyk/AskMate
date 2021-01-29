@@ -3,8 +3,16 @@
 	<p class="fw-bold my-1">Tags</p>
 	<div class="list-group">
 		{%- for tag in func_tags() -%}
-			<a href="{{ url_for('route_list', tag_id=tag.tag_id) }}" class="d-flex link-secondary text-decoration-none justify-content-between align-items-center my-1 btn ">{{ tag.tag_name }}<span class="badge bg-primary rounded-pill">{{ tag.count }}</span></a>
-		{% endfor -%}
-        <a href="{{ url_for('route_list') }}" class="d-flex link-secondary text-decoration-none justify-content-between align-items-center my-1 btn ">all<span class="badge bg-primary rounded-pill">{{ questions_count() }}</span></a>
+            {% if tag.tag_id|string == last_tag_id|string %}
+                <a href="{{ url_for('route_list', tag_id=tag.tag_id) }}" class="d-flex link-secondary text-decoration-none justify-content-between align-items-center my-1 btn bg-primary text-white">{{ tag.tag_name }}<span class="badge bg-primary rounded-pill">{{ tag.count }}</span></a>
+            {% else %}
+                <a href="{{ url_for('route_list', tag_id=tag.tag_id) }}" class="d-flex link-secondary text-decoration-none justify-content-between align-items-center my-1 btn ">{{ tag.tag_name }}<span class="badge bg-primary rounded-pill">{{ tag.count }}</span></a>
+            {% endif %}
+        {% endfor -%}
+        {% if last_tag_id|string == 'all'%}
+            <a href="{{ url_for('route_list') }}" class="d-flex link-secondary text-decoration-none justify-content-between align-items-center my-1 btn bg-primary text-white">all<span class="badge bg-primary rounded-pill">{{ questions_count() }}</span></a>
+        {% else %}
+            <a href="{{ url_for('route_list') }}" class="d-flex link-secondary text-decoration-none justify-content-between align-items-center my-1 btn ">all<span class="badge bg-primary rounded-pill">{{ questions_count() }}</span></a>
+        {% endif %}
 	</div>
 </aside>

@@ -106,7 +106,7 @@
 {%- endmacro -%}
 
 {# sorting bar #}
-{% macro sort_bar(route="", data="", order_direction="", search_phrase="") %}
+{% macro sort_bar(route="", data="", order_direction="", search_phrase="", last_tag_id='', last_pagination_index='', last_order_by='') %}
 	{%- if data.total == 0 %}
 		<div class="container mt-3">
 			<p>Your search - did not match any documents.</p>
@@ -118,7 +118,7 @@
 			</ul>
 		</div>
 	{%- else -%}
-		{%- set dict_sort_by = ({'Title': 'title', 'View': 'view_number', 'Votes': 'vote_number'}) -%}
+		{%- set dict_sort_by = ({'Time': 'submission_time', 'Title': 'title', 'View': 'view_number', 'Votes': 'vote_number'}) -%}
 		<div class="container mt-3 px-0">
 			<div class="row">
 				<div class="col p-1 fs-3 ms-2">
@@ -131,7 +131,7 @@
 				<div class="col text-end">
 					<div class="btn-group" role="group" aria-label="Basic outlined">
 						{% for item, value in dict_sort_by.items() -%}
-							<a href="{{ url_for(route, page=data.page, order_by=value, order_direction=order_direction) }}" type="button" class="btn mt-0 btn-outline-primary">{{ item }}&nbsp;<i class="fas fa-sort"></i></a>
+							<a href="{{ url_for(route, page=data.page, order_by=value, order_direction=order_direction, last_tag_id=last_tag_id, last_order_by=last_order_by) }}" type="button" class="btn mt-0 btn-outline-primary">{{ item }}&nbsp;<i class="fas fa-sort"></i></a>
 						{% endfor -%}
 					</div>
 				</div>
@@ -141,7 +141,8 @@
 {%- endmacro -%}
 
 {# generate list of questions#}
-{% macro macro_generate_question_list(item="", the_list="", route="", search_phrase='') %}
+{% macro macro_generate_question_list(item="", the_list="", route="", search_phrase='', pagination_count='', last_tag_id='', last_order_by='', asc_desc='') %}
+    {{ macro_pagination(pagination_count=pagination_count, last_tag_id=last_tag_id, last_order_by=last_order_by, asc_desc=asc_desc) }}
 	{% for item in the_list %}
 		<div class="card text-dark bg-light mt-3">
 			<div class="card-header d-flex">
@@ -153,7 +154,7 @@
 				<ul class="col-2 list-inline text-end mb-0">
 					<li class="list-inline-item">
 						<small class="text-muted">{{ item.time.strftime('%y-%m-%d') }}</small></li>
-					<li class="list-inline-item"><small class="text-muted">{{ item.view_number }} views</small>
+					<li class="list-inline-item"><small class="text-muted">{{ item.views }} views</small>
 					</li>
 					<li class="list-inline-item"></li>
 				</ul>
@@ -177,5 +178,19 @@
 			</div>
 		</div>
 	{% endfor %}
+    {% if the_list|length > 6 %}
+        {{ macro_pagination(pagination_count=pagination_count, last_tag_id=last_tag_id, last_order_by=last_order_by, asc_desc=asc_desc) }}
+    {% endif %}
+
+{% endmacro %}
+
+{% macro macro_pagination(pagination_count='', last_tag_id='', last_order_by ='', asc_desc='') %}
+    <nav aria-label="Page navigation example">
+      <ul class="pagination">
+        {% for index in range(pagination_count) %}
+            <li class="page-item"><a class="page-link" href={{ url_for('route_list', pagination_index = index, last_tag_id=last_tag_id, last_order_by=last_order_by, asc_desc=asc_desc) }}>{{ index + 1 }}</a></li>
+        {% endfor %}
+      </ul>
+    </nav>
 {% endmacro %}
 

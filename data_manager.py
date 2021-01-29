@@ -7,7 +7,7 @@ from psycopg2.extras import RealDictCursor
 import connection
 
 DEFAULT_ORDER_BY = 'submission_time'
-DEFAULT_ORDER_DIR = 'DESC'
+DEFAULT_ORDER_DIR = 'ASC'
 
 @connection.connection_handler
 def remove_question(cursor: RealDictCursor, question_id: int) -> None:
@@ -409,6 +409,25 @@ def count_questions(cursor: RealDictCursor) -> int:
     """
     cursor.execute(query)
     return cursor.fetchall()[0]['questions_count']
+
+def pagination(data: list, pagination_range: int = 10) -> list:
+    full_list_count = len(data) // pagination_range #data change to len(data) !!!!!
+    remainder = len(data) % pagination_range  #data change to len(data)   !!!!!
+    count_of_pagination = [pagination_range for index in range(full_list_count)]
+    count_of_pagination.append(remainder)
+    result = []
+    first_index = 0
+    for index in range(len(count_of_pagination)):
+        result.append([])
+        for count in range(count_of_pagination[index]):
+            result[index].append(data[first_index])
+            data.remove(data[first_index])
+    return result
+
+
+def sort_questions(questions: list, sort_by: str, asc_desc: str):
+    return sorted(questions, key=lambda question: question[sort_by], reverse=True if asc_desc == 'asc' else False)
+
 
 
 @connection.connection_handler

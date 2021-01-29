@@ -20,6 +20,7 @@ app.jinja_env.globals.update(
 )
 
 
+
 def save_image(file_ext, img, img_name):
     if file_ext in app.config['UPLOAD_EXTENSIONS']:
         img.save(os.path.join(app.config['UPLOAD_PATH'], img_name))
@@ -67,17 +68,52 @@ def route_logout():
 @app.route("/")
 @app.route("/list", methods=['GET'])
 def route_list(order_by=data_manager.DEFAULT_ORDER_BY, order_direction=data_manager.DEFAULT_ORDER_DIR):
+    pagination_size = 20
+    switch_order_direction = ''
+    last_order_by = order_by
     if request.args.get('order_by') is not None:
+        last_order_by = request.args.get('last_order_by')
         order_by = request.args.get('order_by')
         order_direction = request.args.get('order_direction')
-    switch_order_direction = data_manager.switch_asc_desc(order_direction=order_direction)
-    questions = []
-    if 'tag_id' in request.args:
-        questions = data_manager.get_questions_data_by_tag(
-            sort_column_by=order_by, asc_desc=order_direction, tag_id=request.args['tag_id'])
+        if order_by == last_order_by:
+            switch_order_direction = data_manager.switch_asc_desc(order_direction=order_direction)
+        else:
+            if order_by == 'title':
+                switch_order_direction = 'ASC'
+            else:
+                switch_order_direction = 'DESC'
+    elif request.args.get('last_order_by') is not None:
+        last_order_by = request.args.get('last_order_by')
+        order_by = last_order_by
+        order_direction = request.args['asc_desc']
+        switch_order_direction = request.args['asc_desc']
     else:
-        questions = data_manager.get_questions_data(sort_column_by=order_by, asc_desc=order_direction)
-    return render_template('list.html', questions=questions, asc_desc=switch_order_direction)
+        switch_order_direction = 'DESC'
+
+    questions = []
+    last_tag_id = 'all'
+
+    if 'last_tag_id' in request.args and request.args['last_tag_id'] != last_tag_id:
+        last_tag_id = request.args['last_tag_id']
+        questions = data_manager.get_questions_data_by_tag(
+            sort_column_by=order_by, asc_desc=switch_order_direction, tag_id=str(last_tag_id))
+    elif 'tag_id' in request.args:
+        last_tag_id = request.args['tag_id']
+        questions = data_manager.get_questions_data_by_tag(
+            sort_column_by=order_by, asc_desc=switch_order_direction, tag_id=request.args['tag_id'])
+    else:
+        questions = data_manager.get_questions_data(sort_column_by=order_by, asc_desc=switch_order_direction)
+        last_tag_id = 'all'
+
+    questions = data_manager.pagination(data=questions, pagination_range=20)
+
+
+    pagination_index = request.args['pagination_index'] if 'pagination_index' in request.args else 0
+
+    return render_template(
+        'list.html', questions=questions[int(pagination_index)], asc_desc=switch_order_direction,
+        pagination_count=len(questions), last_tag_id=last_tag_id, last_order_by=order_by
+    )
 
 
 @app.route('/add-question', methods=['GET', 'POST'])
