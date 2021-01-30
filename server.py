@@ -282,6 +282,7 @@ def verify_password(plain_password, hash_password):
 @app.route("/login/", methods=["GET", "POST"])
 def login():
     login_data = {}
+    form = LoginForm(request.form)
     if request.method == "POST":
         login_data['email'] = request.form['email']
         login_data['password'] = request.form['password']
@@ -295,9 +296,9 @@ def login():
             session['email'] = request.form['email']
             return redirect(url_for("route_list"))
     if 'username' in session:
-        return render_template("login.html", username=session["username"])
+        return render_template("login.html", username=session["username"], form=form)
     else:
-        return render_template("login.html")
+        return render_template("login.html", form=form)
 
 
 if __name__ == '__main__':
