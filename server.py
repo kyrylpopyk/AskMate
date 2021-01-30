@@ -66,11 +66,17 @@ def route_logout():
 
 
 @app.route("/")
-@app.route("/list", methods=['GET'])
+@app.route("/list", methods=['GET', 'POST'])
 def route_list(order_by=data_manager.DEFAULT_ORDER_BY, order_direction=data_manager.DEFAULT_ORDER_DIR):
+    questions = []
+    is_search = False
     pagination_size = 20
     switch_order_direction = ''
     last_order_by = order_by
+    last_tag_id = 'all'
+    last_search_phrase = ''
+
+    #---------------------Sorting
     if request.args.get('order_by') is not None:
         last_order_by = request.args.get('last_order_by')
         order_by = request.args.get('order_by')
@@ -90,9 +96,7 @@ def route_list(order_by=data_manager.DEFAULT_ORDER_BY, order_direction=data_mana
     else:
         switch_order_direction = 'DESC'
 
-    questions = []
-    last_tag_id = 'all'
-
+    #---------------------Tags
     if 'last_tag_id' in request.args and request.args['last_tag_id'] != last_tag_id:
         last_tag_id = request.args['last_tag_id']
         questions = data_manager.get_questions_data_by_tag(
@@ -105,14 +109,27 @@ def route_list(order_by=data_manager.DEFAULT_ORDER_BY, order_direction=data_mana
         questions = data_manager.get_questions_data(sort_column_by=order_by, asc_desc=switch_order_direction)
         last_tag_id = 'all'
 
-    questions = data_manager.pagination(data=questions, pagination_range=20)
+    # ---------------------Search
+    if 'search_phrase' in request.form:
+        questions = data_manager.search_phrase(questions=questions, phrase=request.form.get('search_phrase'))
+        is_search = True
+        last_search_phrase = request.form.get('search_phrase')
+    elif 'last_search_phrase' in request.args:
+        if request.args['last_search_phrase'] != '':
+            questions = data_manager.search_phrase(questions=questions, phrase=request.args['last_search_phrase'])
+            is_search = True
+            last_search_phrase = request.args['last_search_phrase']
 
-
+    # ---------------------Pagination
     pagination_index = request.args['pagination_index'] if 'pagination_index' in request.args else 0
+    pag_questions = (data_manager.pagination(data=questions, pagination_range=20))
+    questions = pag_questions[int(pagination_index)]
 
+    # ---------------------Render
     return render_template(
-        'list.html', questions=questions[int(pagination_index)], asc_desc=switch_order_direction,
-        pagination_count=len(questions), last_tag_id=last_tag_id, last_order_by=order_by
+        'list.html', questions=questions, asc_desc=switch_order_direction,
+        pagination_count=len(pag_questions), last_tag_id=last_tag_id, last_order_by=order_by, is_search=is_search,
+        last_search_phrase=last_search_phrase
     )
 
 
