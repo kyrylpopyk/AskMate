@@ -375,14 +375,16 @@ def get_answers_id_by_question(cursor: RealDictCursor, question_id: int):
     cursor.execute(query, param)
     return cursor.fetchall()
 
+
 def fetch_tags():
     return
+
 
 @connection.connection_handler
 def fetch_tags(cursor: RealDictCursor) -> list:
     query = """SELECT id AS tag_id, name AS tag_name FROM tag"""
     cursor.execute(query)
-    tags =  cursor.fetchall()
+    tags = cursor.fetchall()
     return list(tags)
 
 
@@ -397,6 +399,8 @@ def count_tags(cursor: RealDictCursor) -> list:
     """
     cursor.execute(query)
     return cursor.fetchall()
+
+
 @connection.connection_handler
 def count_questions(cursor: RealDictCursor) -> int:
     query = """
@@ -405,6 +409,7 @@ def count_questions(cursor: RealDictCursor) -> int:
     """
     cursor.execute(query)
     return cursor.fetchall()[0]['questions_count']
+
 
 def pagination(data: list, pagination_range: int = 10) -> list:
     full_list_count = len(data) // pagination_range #data change to len(data) !!!!!
@@ -424,6 +429,7 @@ def pagination(data: list, pagination_range: int = 10) -> list:
 def sort_questions(questions: list, sort_by: str, asc_desc: str):
     return sorted(questions, key=lambda question: question[sort_by], reverse=True if asc_desc == 'asc' else False)
 
+
 def search_phrase(questions: list, phrase: str) -> list:
     result = []
 
@@ -434,6 +440,7 @@ def search_phrase(questions: list, phrase: str) -> list:
             result.append(question)
 
     return result
+
 
 def search_into_string(line: str,phrase: str):
     mark_start = '<span class="bg-primary text-white">'
@@ -461,9 +468,54 @@ def search_into_string(line: str,phrase: str):
     return ready_to_put, line
 
 
+@connection.connection_handler
+def find_all_emails(cursor: RealDictCursor, email: str):
+    query = """
+    select * from users
+    where email = %(email)s
+    """
+    param = {'email': email}
+    cursor.execute(query, param)
+    return cursor.fetchall()
 
 
+@connection.connection_handler
+def check_login(cursor: RealDictCursor, email):
+    query = """
+    select email from users
+    where email = %(email)s
+    """
+    cursor.execute(query, {"email": email})
+    compare = cursor.fetchall()
+    if len(compare) == 0:
+        return False
+    else:
+        return True
 
+
+@connection.connection_handler
+def check_password(cursor: RealDictCursor, password, email):
+    query = """
+    select password from users
+    where password = %(password)s and email = %(email)s
+    """
+    cursor.execute(query, {"password": password, "email": email})
+    compare = cursor.fetchall()
+    if len(compare) == 0:
+        return False
+    else:
+        return True
+
+
+@connection.connection_handler
+def register_new_user(cursor, data):
+    cursor.execute("""INSERT INTO comment VALUES (%(username)s, %(email)s, %(password)s, 
+                    %(date)s, %(pic)s);""",
+                   {"username": data['user_name'],
+                    "email": data['email'],
+                    "password": data['password'],
+                    "date": get_time(),
+                    "pic": data['picture']})
 # --------------------------------------------------------------------------------------- AskMate v.1
 FIRST_ITEM = 0
 SECOND_ITEM = 1

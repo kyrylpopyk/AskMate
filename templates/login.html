@@ -4,13 +4,12 @@
 {% block content %}
 	<div class="container">
 		<div class="row justify-content-center">
-			<form action="{{ url_for('route_login') }}" method="post" class="row w-50">
+			<form action="{{ url_for('login') }}" method="post" class="row w-50">
 				{{ form.hidden_tag() }}
 				<fieldset>
 					<legend class="border-bottom mb-4 text-center">Log In</legend>
 					{{ macro_render_field(form.email) }}
 					{{ macro_render_field(form.password) }}
-
 					<div class="form-check">
 						{{ form.remember(class="form-check-input") }}
 						{{ form.remember.label(class="form-check-label") }}

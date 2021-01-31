@@ -3,6 +3,7 @@ from util import os
 from werkzeug.utils import secure_filename
 from forms import RegistrationForm, LoginForm, QuestionForm
 import data_manager
+import bcrypt
 
 app = Flask(__name__)
 app.url_map.strict_slashes = False
@@ -17,7 +18,6 @@ app.jinja_env.globals.update(
     func_tags=data_manager.count_tags,
     questions_count=data_manager.count_questions
 )
-
 
 
 def save_image(file_ext, img, img_name):
@@ -42,25 +42,36 @@ def too_large(e):
 
 @app.route("/register", methods=['GET', 'POST'])
 def route_register():
-    print(session)
-    print(request.form)
-    form = RegistrationForm()
+    form = RegistrationForm(request.form)
+    register_form = {}
+    if request.method == 'POST':
+        if request.form['date'] == request.form['date']:
+            register_form['username'] = request.form['user_name']
+            register_form['pic'] = request.form['picture']
+            register_form['email'] = request.form['email']
+            register_form['password'] = request.form['password']
+        else:
+            return render_template("register.html", pass_message='passwords are not the same', form=form)
+        return render_template("register.html", form=form)
+    if 'username' in session:
+        return render_template("register.html", username=session["user_name"])
+    else:
+        return render_template("register.html")
 
-    return render_template('register.html', form=form)
+
+# @app.route("/login", methods=['GET', 'POST'])
+# def route_login():
+#     print(request.form)
+#     print(session)
+#     form = LoginForm()
+#
+#     return render_template('login.html', form=form)
 
 
-@app.route("/login", methods=['GET', 'POST'])
-def route_login():
-    print(request.form)
-    print(session)
-    form = LoginForm()
-
-    return render_template('login.html', form=form)
-
-
-@app.route("/logout")
+@app.route("/logout", methods=["GET"])
 def route_logout():
-    # logout_user()
+    session.pop("email", None)
+    flash("See You later :) !")
     return redirect(url_for('route_list'))
 
 
@@ -289,6 +300,32 @@ def route_add_comment_for_answer(question_id, answer_id):
     data_manager.add_comment(new_comment)
     return redirect(url_for("route_question", question_id=question_id))
 
+
+def verify_password(plain_password, hash_password):
+    hashed_byte_password = hash_password.encode("UTF-8")
+    return bcrypt.checkpw(plain_password.encode("UTF-8"), hashed_byte_password)
+
+
+@app.route("/login/", methods=["GET", "POST"])
+def login():
+    login_data = {}
+    form = LoginForm(request.form)
+    if request.method == "POST":
+        login_data['email'] = request.form['email']
+        login_data['password'] = request.form['password']
+        user_check = data_manager.check_login(login_data['email'])
+        password_check = data_manager.check_password(login_data['password'], login_data['email'])
+        if user_check == False or password_check == False:
+            flash("Incorrect password or username. Try again!")
+            return render_template('login.html', form=form)
+        else:
+            flash("You are logged in!")
+            session['email'] = request.form['email']
+            return redirect(url_for("route_list", form=form))
+    if 'username' in session:
+        return render_template("login.html", username=session["username"], form=form)
+    else:
+        return render_template("login.html", form=form)
 
 
 if __name__ == '__main__':
