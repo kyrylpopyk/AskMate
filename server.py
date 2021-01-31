@@ -305,8 +305,8 @@ def login():
         user_check = data_manager.check_login(login_data['email'])
         password_check = data_manager.check_password(login_data['email'])
         if user_check == False or password_check == False:
-            message = 'Username or password is incorrect. Please try again.'
-            return render_template('login.html', message=message, form=form)
+            flash("Incorrect password or username. Try again!")
+            return render_template('login.html', form=form)
         else:
             flash("You are logged in!")
             session['email'] = request.form['email']
