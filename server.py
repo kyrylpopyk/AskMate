@@ -42,11 +42,21 @@ def too_large(e):
 
 @app.route("/register", methods=['GET', 'POST'])
 def route_register():
-    print(session)
-    print(request.form)
-    form = RegistrationForm()
-
-    return render_template('register.html', form=form)
+    form = RegistrationForm(request.form)
+    register_form = {}
+    if request.method == 'POST':
+        if request.form['date'] == request.form['date']:
+            register_form['username'] = request.form['user_name']
+            register_form['pic'] = request.form['picture']
+            register_form['email'] = request.form['email']
+            register_form['password'] = request.form['password']
+        else:
+            return render_template("register.html", pass_message='passwords are not the same', form=form)
+        return render_template("register.html", form=form)
+    if 'username' in session:
+        return render_template("register.html", username=session["user_name"])
+    else:
+        return render_template("register.html")
 
 
 # @app.route("/login", methods=['GET', 'POST'])
@@ -61,6 +71,7 @@ def route_register():
 @app.route("/logout", methods=["GET"])
 def route_logout():
     session.pop("email", None)
+    flash("See You later :) !")
     return redirect(url_for('route_list'))
 
 
@@ -303,7 +314,7 @@ def login():
         login_data['email'] = request.form['email']
         login_data['password'] = request.form['password']
         user_check = data_manager.check_login(login_data['email'])
-        password_check = data_manager.check_password(login_data['email'])
+        password_check = data_manager.check_password(login_data['password'], login_data['email'])
         if user_check == False or password_check == False:
             flash("Incorrect password or username. Try again!")
             return render_template('login.html', form=form)
