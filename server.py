@@ -20,7 +20,6 @@ app.jinja_env.globals.update(
 )
 
 
-
 def save_image(file_ext, img, img_name):
     if file_ext in app.config['UPLOAD_EXTENSIONS']:
         img.save(os.path.join(app.config['UPLOAD_PATH'], img_name))
@@ -59,9 +58,9 @@ def route_register():
 #     return render_template('login.html', form=form)
 
 
-@app.route("/logout")
+@app.route("/logout", methods=["GET"])
 def route_logout():
-    # logout_user()
+    session.pop("email", None)
     return redirect(url_for('route_list'))
 
 
@@ -307,11 +306,11 @@ def login():
         password_check = data_manager.check_password(login_data['email'])
         if user_check == False or password_check == False:
             message = 'Username or password is incorrect. Please try again.'
-            return render_template('login.html', message=message)
+            return render_template('login.html', message=message, form=form)
         else:
             flash("You are logged in!")
             session['email'] = request.form['email']
-            return redirect(url_for("route_list"))
+            return redirect(url_for("route_list", form=form))
     if 'username' in session:
         return render_template("login.html", username=session["username"], form=form)
     else:
