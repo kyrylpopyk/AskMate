@@ -18,3 +18,20 @@ select question.id, tag.id
 from question, tag
 where tag.id = 5;
 
+
+----------------01.02.21
+
+ALTER TABLE question
+ADD user_name varchar;
+update question
+set user_name = 'user';
+
+ALTER TABLE answer
+ADD user_name varchar;
+update answer
+set user_name = 'user';
+
+ALTER TABLE comment
+ADD user_name varchar;
+update comment
+set user_name = 'user';

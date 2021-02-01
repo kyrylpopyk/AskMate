@@ -153,6 +153,12 @@ def route_add_question():
         }
     )
 
+    if 'email' in session:
+        user_name = data_manager.get_user_name_by_email(email=session.get('email'))
+        new_question_all_data.update({'user_name': user_name[0]['user_name']})
+    else:
+        new_question_all_data.update({'user_name': 'user'})
+
     data_manager.save_question(new_question_all_data)
 
     return redirect(url_for('route_list'))
@@ -260,6 +266,11 @@ def route_add_comment_for_question(question_id):
             "answer_id": None,
             "question_id": question_id
         }
+        if 'email' in session:
+            user_name = data_manager.get_user_name_by_email(email=session.get('email'))
+            new_comment.update({'user_name': user_name[0]['user_name']})
+        else:
+            new_comment.update({'user_name': 'user'})
 
         data_manager.add_comment(new_comment)
         return redirect(url_for("route_question", question_id=question_id))
@@ -275,8 +286,15 @@ def route_add_comment_for_answer(question_id, answer_id):
             "answer_id": answer_id,
             "question_id": None
         }
-    data_manager.add_comment(new_comment)
-    return redirect(url_for("route_question", question_id=question_id))
+
+        if 'email' in session:
+            user_name = data_manager.get_user_name_by_email(email=session.get('email'))
+            new_comment.update({'user_name': user_name[0]['user_name']})
+        else:
+            new_comment.update({'user_name': 'user'})
+
+        data_manager.add_comment(new_comment)
+        return redirect(url_for("route_question", question_id=question_id))
 
 
 def verify_password(plain_password, hash_password):

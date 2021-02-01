@@ -42,7 +42,8 @@ def get_questions_data(cursor: RealDictCursor, asc_desc: str, sort_column_by: st
     question.vote_number as "votes",
     question.message, tag.name as tag,
     count(answer.message) as answers_count,
-    count(comment.message) as comments_count
+    count(comment.message) as comments_count,
+    question.user_name
     from question
     left join comment
     on question.id = comment.question_id
@@ -70,7 +71,8 @@ def get_questions_data_by_tag(cursor: RealDictCursor, asc_desc: str, sort_column
     question.vote_number as "votes",
     question.message, tag.name as tag,
     count(answer.message) as answers_count,
-    count(comment.message) as comments_count
+    count(comment.message) as comments_count,
+    question.user_name
     from question
     left join comment
     on question.id = comment.question_id
@@ -108,7 +110,9 @@ def find_comment_by_answer_id(cursor: RealDictCursor, answer_id: str) -> list:
 @connection.connection_handler
 def find_question_by_id(cursor: RealDictCursor, question_id: str) -> list:
     query = """
-    select  * from question where id = %(question_id)s;"""
+    select  *
+    from question
+    where id = %(question_id)s;"""
     param = {'question_id': question_id}
     cursor.execute(query, param)
     return cursor.fetchall()
@@ -204,7 +208,8 @@ def modify_answer_votes(cursor: RealDictCursor, question_id: str, answer_id: str
 @connection.connection_handler
 def find_all_answers_by_question_id(cursor: RealDictCursor, question_id: str):
     query = """
-    select * from answer
+    select *
+    from answer
     where question_id = %(question_id)s
     order by submission_time desc;
     """
@@ -278,18 +283,20 @@ def add_question():
 
 
 @connection.connection_handler
-def save_question(cursor, data):
-    cursor.execute("""INSERT INTO question VALUES (%(new_id_value)s, %(new_submission_time_value)s, %(new_view_number_value)s, 
-                    %(new_vote_number_value)s, %(new_title_value)s, %(new_message_value)s, %(new_image_value)s);
-                    INSERT INTO question_tag VALUES (%(new_id_value)s, %(tag_id)s)""",
-                   {"new_id_value": data['id'],
+def save_question(cursor: RealDictCursor, data):
+    command = """INSERT INTO question VALUES (%(new_id_value)s, %(new_submission_time_value)s, %(new_view_number_value)s, 
+                    %(new_vote_number_value)s, %(new_title_value)s, %(new_message_value)s, %(new_image_value)s, %(user_name)s);
+                    INSERT INTO question_tag VALUES (%(new_id_value)s, %(tag_id)s);"""
+    param = {"new_id_value": data['id'],
                     "new_submission_time_value": data['submission_time'],
                     "new_view_number_value": data['view_number'],
                     "new_vote_number_value": data['vote_number'],
                     "new_title_value": data['title'],
                     "new_message_value": data['message'],
                     "new_image_value": data['image'],
-                    "tag_id": data['tag_id']})
+                    "tag_id": data['tag_id'],
+                    "user_name": data['user_name']}
+    cursor.execute(command, param)
 
 
 @connection.connection_handler
@@ -344,13 +351,14 @@ def edit_answer(cursor, answer_id, edited_data):
 @connection.connection_handler
 def add_comment(cursor, data):
     cursor.execute("""INSERT INTO comment VALUES (%(id_value)s, %(question_id_value)s, %(answer_id_value)s, 
-                    %(message_value)s, %(submission_time_value)s, %(edited_count_value)s);""",
+                    %(message_value)s, %(submission_time_value)s, %(edited_count_value)s, %(user_name)s);""",
                    {"id_value": get_comment_id(),
                     "question_id_value": data['question_id'],
                     "answer_id_value": data['answer_id'],
                     "message_value": data['message'],
                     "submission_time_value": get_time(),
-                    "edited_count_value": None})
+                    "edited_count_value": None,
+                    "user_name": data['user_name']})
 
 
 @connection.connection_handler
@@ -516,6 +524,19 @@ def register_new_user(cursor, data):
                     "password": data['password'],
                     "date": get_time(),
                     "pic": data['picture']})
+
+
+@connection.connection_handler
+def get_user_name_by_email(cursor: RealDictCursor, email: str) -> str:
+    query = """
+    select users.user_name
+    from users
+    where users.email = %(email)s;
+    """
+    param = {'email': email}
+    cursor.execute(query, param)
+    return cursor.fetchall()
+
 # --------------------------------------------------------------------------------------- AskMate v.1
 FIRST_ITEM = 0
 SECOND_ITEM = 1

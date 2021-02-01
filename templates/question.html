@@ -83,7 +83,7 @@
 													<tr>
 														<td>{{ comment.message }}</td>
 														<td>
-															<small class="text-muted"><a class="text-decoration-none" href="#">nickname</a></small>
+															<small class="text-muted"><a class="text-decoration-none" href="#">{{ comment.user_name }}</a></small>
 														</td>
 													</tr>
 												{% endfor %}
@@ -162,7 +162,7 @@
 									{% for comment in answer_comments %}
 										<tr>
 											<td class="border-bottom-0" style="font-size: small">{{ comment.message }} -
-												<small style="font-size: small" class="text-muted"><a class="text-decoration-none" href="#">nickname</a></small>
+												<small style="font-size: small" class="text-muted"><a class="text-decoration-none" href="#">{{ comment.user_name }}</a></small>
 											</td>
 										</tr>
 									{% endfor %}
