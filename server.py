@@ -43,29 +43,7 @@ def too_large(e):
 @app.route("/register", methods=['GET', 'POST'])
 def route_register():
     form = RegistrationForm(request.form)
-    register_form = {}
-    if request.method == 'POST':
-        if request.form['date'] == request.form['date']:
-            register_form['username'] = request.form['user_name']
-            register_form['pic'] = request.form['picture']
-            register_form['email'] = request.form['email']
-            register_form['password'] = request.form['password']
-        else:
-            return render_template("register.html", pass_message='passwords are not the same', form=form)
-        return render_template("register.html", form=form)
-    if 'username' in session:
-        return render_template("register.html", username=session["user_name"])
-    else:
-        return render_template("register.html")
-
-
-# @app.route("/login", methods=['GET', 'POST'])
-# def route_login():
-#     print(request.form)
-#     print(session)
-#     form = LoginForm()
-#
-#     return render_template('login.html', form=form)
+    pass
 
 
 @app.route("/logout", methods=["GET"])
