@@ -267,7 +267,7 @@ def get_user_id(cursor):
     try:
         cursor.execute("""SELECT MAX(user_id) from users;""")
         new_id = cursor.fetchall()[0]['max'] + 1
-    except KeyError:
+    except TypeError:
         new_id = 0
     return new_id
 
@@ -504,20 +504,6 @@ def check_login(cursor: RealDictCursor, email):
     where email = %(email)s
     """
     cursor.execute(query, {"email": email})
-    compare = cursor.fetchall()
-    if len(compare) == 0:
-        return False
-    else:
-        return True
-
-
-@connection.connection_handler
-def check_password(cursor: RealDictCursor, password, email):
-    query = """
-    select password from users
-    where password = %(password)s and email = %(email)s
-    """
-    cursor.execute(query, {"password": password, "email": email})
     compare = cursor.fetchall()
     if len(compare) == 0:
         return False
