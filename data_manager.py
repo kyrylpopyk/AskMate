@@ -263,6 +263,16 @@ def get_answer_id(cursor):
 
 
 @connection.connection_handler
+def get_user_id(cursor):
+    try:
+        cursor.execute("""SELECT MAX(user_id) from users;""")
+        new_id = cursor.fetchall()[0]['max'] + 1
+    except KeyError:
+        new_id = 0
+    return new_id
+
+
+@connection.connection_handler
 def get_comment_id(cursor):
     try:
         cursor.execute("""SELECT MAX(id) from comment;""")
@@ -516,14 +526,11 @@ def check_password(cursor: RealDictCursor, password, email):
 
 
 @connection.connection_handler
-def register_new_user(cursor, data):
-    cursor.execute("""INSERT INTO comment VALUES (%(username)s, %(email)s, %(password)s, 
-                    %(date)s, %(pic)s);""",
-                   {"username": data['user_name'],
-                    "email": data['email'],
-                    "password": data['password'],
-                    "date": get_time(),
-                    "pic": data['picture']})
+def register_new_user(cursor: RealDictCursor, user_name, email, password):
+    cursor.execute("""
+                    INSERT INTO users
+                    VALUES (%(user_id)s, %(user_name)s, %(email)s, %(password)s, %(register_date)s)
+                    """, {'user_id': get_user_id(), 'user_name': user_name, 'email': email, 'password': password, 'register_date': get_time()})
 
 
 @connection.connection_handler

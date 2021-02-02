@@ -3,6 +3,7 @@ from util import os
 from werkzeug.utils import secure_filename
 from forms import RegistrationForm, LoginForm, QuestionForm
 import data_manager
+import util
 import bcrypt
 
 app = Flask(__name__)
@@ -43,7 +44,21 @@ def too_large(e):
 @app.route("/register", methods=['GET', 'POST'])
 def route_register():
     form = RegistrationForm(request.form)
-    pass
+    if request.method == 'GET':
+        return render_template('register.html', form=form)
+
+    username = request.form["username"]
+    email = request.form["email"]
+    password = request.form["password"]
+    confirm_password = request.form["confirm_password"]
+
+    if password != confirm_password:
+        flash("Passwords are not the same!")
+        return render_template('register.html', form=form)
+    hash_pswd = util.hash_password(password)
+    data_manager.register_new_user(username, email, hash_pswd)
+    flash("Welcome in our team :) !!!")
+    return redirect("register")
 
 
 @app.route("/logout", methods=["GET"])
