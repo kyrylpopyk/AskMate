@@ -544,6 +544,26 @@ def get_user_name_by_email(cursor: RealDictCursor, email: str) -> str:
     cursor.execute(query, param)
     return cursor.fetchall()
 
+
+@connection.connection_handler
+def find_user_email(cursor, email):
+    cursor.execute("""
+                    SELECT email FROM users
+                    """)
+    list_of_all_user_emails = [email['email'] for email in cursor.fetchall()]
+
+    return email in list_of_all_user_emails
+
+
+@connection.connection_handler
+def get_password_database(cursor, email):
+    cursor.execute("""
+                    SELECT password FROM users
+                    WHERE email = %(email)s
+                    """, {'email': email})
+    hashed_password = cursor.fetchone()
+    return hashed_password['password']
+
 # --------------------------------------------------------------------------------------- AskMate v.1
 FIRST_ITEM = 0
 SECOND_ITEM = 1

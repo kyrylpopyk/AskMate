@@ -4,7 +4,6 @@ from werkzeug.utils import secure_filename
 from forms import RegistrationForm, LoginForm, QuestionForm
 import data_manager
 import util
-import bcrypt
 
 app = Flask(__name__)
 app.url_map.strict_slashes = False
@@ -312,31 +311,23 @@ def route_add_comment_for_answer(question_id, answer_id):
         return redirect(url_for("route_question", question_id=question_id))
 
 
-def verify_password(plain_password, hash_password):
-    hashed_byte_password = hash_password.encode("UTF-8")
-    return bcrypt.checkpw(plain_password.encode("UTF-8"), hashed_byte_password)
-
-
 @app.route("/login/", methods=["GET", "POST"])
 def login():
-    login_data = {}
     form = LoginForm(request.form)
-    if request.method == "POST":
-        login_data['email'] = request.form['email']
-        login_data['password'] = request.form['password']
-        user_check = data_manager.check_login(login_data['email'])
-        password_check = data_manager.check_password(login_data['password'], login_data['email'])
-        if user_check == False or password_check == False:
-            flash("Incorrect password or username. Try again!")
-            return render_template('login.html', form=form)
-        else:
-            flash("You are logged in!")
-            session['email'] = request.form['email']
-            return redirect(url_for("route_list", form=form))
-    if 'username' in session:
-        return render_template("login.html", username=session["username"], form=form)
-    else:
+    if request.method == "GET":
         return render_template("login.html", form=form)
+
+    email = request.form['email']
+    plain_password = request.form['password']
+
+    if data_manager.find_user_email(email):
+        hashed_pswd = data_manager.get_password_database(email)
+        if util.check_password(plain_password, hashed_pswd):
+            session['email'] = email
+            flash("You are logged in!")
+            return redirect(url_for("route_list", form=form))
+    flash("Invalid email or password, try again!")
+    return render_template("login.html", form=form)
 
 
 if __name__ == '__main__':
