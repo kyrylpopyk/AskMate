@@ -257,7 +257,8 @@ def route_question(question_id):
             data_manager.remove_answer(question_id=question_id, answer_id=answer_id)
             return redirect(url_for('route_question', question_id=question_id))
 
-        data_manager.modify_views_votes(data_to_modify=data_to_modify, question=question, answers_list=answers_list)
+        reputation_target = request.args.get('reputation_target')
+        data_manager.modify_views_votes(data_to_modify=data_to_modify, question=question, answers_list=answers_list, reputation_target=reputation_target)
         return redirect(url_for('route_question', question_id=question_id))
 
     if request.method == 'GET':
@@ -266,8 +267,10 @@ def route_question(question_id):
         return render_template('question.html', question=question[0], answers=answers_list, comments_for_question=list_comments_for_question, comments_for_answers=list_comments_for_answers)
 
     elif request.method == 'POST':
-        new_answer = request.form["message"]
-        data_manager.add_answer(new_answer, question_id)
+        new_answer = {'message': request.form["message"]}
+        if 'email' in session:
+            new_answer['user_name'] = data_manager.get_user_name_by_email(session.get('email'))
+        data_manager.add_answer(new_answer['message'], question_id, user_name=new_answer['user_name'])
         return redirect(url_for("route_question", question_id=question_id))
 
 

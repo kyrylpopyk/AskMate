@@ -142,8 +142,10 @@
 
 {# generate list of questions#}
 {% macro macro_generate_question_list(item="", the_list="", route="", search_phrase='', pagination_count='', last_tag_id='', last_order_by='', asc_desc='', is_search='', last_search_phrase = '') %}
-    {{ macro_pagination(pagination_count=pagination_count, last_tag_id=last_tag_id, last_order_by=last_order_by, asc_desc=asc_desc, last_search_phrase=last_search_phrase) }}
-	{% for item in the_list %}
+    {% if the_list|length > 0 %}
+        {{ macro_pagination(pagination_count=pagination_count, last_tag_id=last_tag_id, last_order_by=last_order_by, asc_desc=asc_desc, last_search_phrase=last_search_phrase) }}
+	{% endif %}
+    {% for item in the_list %}
 		<div class="card text-dark bg-light mt-3">
 			<div class="card-header d-flex">
 				<div class="col-10  fw-bold text-start">

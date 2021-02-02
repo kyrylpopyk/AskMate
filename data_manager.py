@@ -6,6 +6,8 @@ from psycopg2.extras import RealDictCursor
 
 import connection
 
+from flask import session
+
 DEFAULT_ORDER_BY = 'submission_time'
 DEFAULT_ORDER_DIR = 'ASC'
 
@@ -219,9 +221,11 @@ def find_all_answers_by_question_id(cursor: RealDictCursor, question_id: str):
     return cursor.fetchall()
 
 
-def modify_views_votes(data_to_modify: dict, question: list, answers_list: list) -> None:
+def modify_views_votes(data_to_modify: dict, question: list, answers_list: list, reputation_target: str) -> None:
     for key in data_to_modify.keys():
         if key == 'questions_votes':
+            if is_user_name_available(user_name=reputation_target):
+                uppdate_user_reputation(user_name=reputation_target, value=data_to_modify.get(key))
             modify_question_votes(question_id=question[0]['id'], value=data_to_modify.get(key))
         elif key == 'questions_views':
             modify_question_views(question_id=question[0]['id'])
@@ -230,6 +234,8 @@ def modify_views_votes(data_to_modify: dict, question: list, answers_list: list)
             for row in answers_list:
                 if (str(row['question_id']) == str(question[0]['id'])) and (str(row['id']) == str(data_to_modify['answer_id'])):
                     answer.append(row)
+            if is_user_name_available(user_name=reputation_target):
+                uppdate_user_reputation(user_name=reputation_target, value=data_to_modify.get(key))
             modify_answer_votes(question_id=question[0]['id'], answer_id=answer[0]['id'], value=data_to_modify.get(key))
 
 
@@ -267,7 +273,7 @@ def get_user_id(cursor):
     try:
         cursor.execute("""SELECT MAX(user_id) from users;""")
         new_id = cursor.fetchall()[0]['max'] + 1
-    except KeyError:
+    except TypeError: #KeyError
         new_id = 0
     return new_id
 
@@ -277,7 +283,7 @@ def get_comment_id(cursor):
     try:
         cursor.execute("""SELECT MAX(id) from comment;""")
         new_id = cursor.fetchall()[0]['max'] + 1
-    except Exception:
+    except KeyError:
         new_id = 0
     return new_id
 
@@ -325,23 +331,25 @@ def edit_question(cursor, question_id, edited_data):
 @connection.connection_handler
 def save_answer(cursor, data):
     cursor.execute("""INSERT INTO answer VALUES (%(new_id_value)s, %(new_submission_time_value)s, %(new_vote_number_value)s, 
-                    %(new_question_id_value)s, %(new_message_value)s, %(new_image_value)s);""",
+                    %(new_question_id_value)s, %(new_message_value)s, %(new_image_value)s, %(user_name)s);""",
                    {"new_id_value": data['id'],
                     "new_submission_time_value": data['submission_time'],
                     "new_vote_number_value": data['vote_number'],
                     "new_question_id_value": data['question_id'],
                     "new_message_value": data['message'],
-                    "new_image_value": data['image']})
+                    "new_image_value": data['image'],
+                    "user_name": data['user_name']})
 
 
-def add_answer(new_answer, question_id):
+def add_answer(new_answer, question_id, user_name: str):
     new_answer_data = {
         "id": get_answer_id(),
         "submission_time": get_time(),
         "vote_number": "0",
         "question_id": question_id,
         "message": new_answer,
-        "image": ""
+        "image": "",
+        "user_name": user_name[0]['user_name']
     }
     save_answer(new_answer_data)
 
@@ -563,6 +571,30 @@ def get_password_database(cursor, email):
                     """, {'email': email})
     hashed_password = cursor.fetchone()
     return hashed_password['password']
+
+
+@connection.connection_handler
+def uppdate_user_reputation(cursor: RealDictCursor, user_name: str, value: int):
+    command = """
+    UPDATE users
+    SET reputation = reputation + %(value)s
+    where user_name = %(user_name)s;
+    """
+    param = {'user_name': user_name, 'value': value}
+    cursor.execute(command, param)
+
+@connection.connection_handler
+def is_user_name_available(cursor: RealDictCursor, user_name: str):
+    query = """SELECT users.user_name 
+    FROM users
+    WHERE users.user_name = %(user_name)s"""
+    param = {'user_name': user_name}
+    cursor.execute(query, param)
+    user = cursor.fetchall()
+    if len(user) == 1:
+        return True
+    else:
+        return False
 
 # --------------------------------------------------------------------------------------- AskMate v.1
 FIRST_ITEM = 0
