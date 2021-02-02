@@ -6,8 +6,6 @@ from psycopg2.extras import RealDictCursor
 
 import connection
 
-from flask import session
-
 DEFAULT_ORDER_BY = 'submission_time'
 DEFAULT_ORDER_DIR = 'ASC'
 
@@ -273,7 +271,7 @@ def get_user_id(cursor):
     try:
         cursor.execute("""SELECT MAX(user_id) from users;""")
         new_id = cursor.fetchall()[0]['max'] + 1
-    except TypeError: #KeyError
+    except KeyError:
         new_id = 0
     return new_id
 
@@ -283,7 +281,7 @@ def get_comment_id(cursor):
     try:
         cursor.execute("""SELECT MAX(id) from comment;""")
         new_id = cursor.fetchall()[0]['max'] + 1
-    except KeyError:
+    except Exception:
         new_id = 0
     return new_id
 
@@ -331,25 +329,23 @@ def edit_question(cursor, question_id, edited_data):
 @connection.connection_handler
 def save_answer(cursor, data):
     cursor.execute("""INSERT INTO answer VALUES (%(new_id_value)s, %(new_submission_time_value)s, %(new_vote_number_value)s, 
-                    %(new_question_id_value)s, %(new_message_value)s, %(new_image_value)s, %(user_name)s);""",
+                    %(new_question_id_value)s, %(new_message_value)s, %(new_image_value)s);""",
                    {"new_id_value": data['id'],
                     "new_submission_time_value": data['submission_time'],
                     "new_vote_number_value": data['vote_number'],
                     "new_question_id_value": data['question_id'],
                     "new_message_value": data['message'],
-                    "new_image_value": data['image'],
-                    "user_name": data['user_name']})
+                    "new_image_value": data['image']})
 
 
-def add_answer(new_answer, question_id, user_name: str):
+def add_answer(new_answer, question_id):
     new_answer_data = {
         "id": get_answer_id(),
         "submission_time": get_time(),
         "vote_number": "0",
         "question_id": question_id,
         "message": new_answer,
-        "image": "",
-        "user_name": user_name[0]['user_name']
+        "image": ""
     }
     save_answer(new_answer_data)
 
@@ -571,7 +567,6 @@ def get_password_database(cursor, email):
                     """, {'email': email})
     hashed_password = cursor.fetchone()
     return hashed_password['password']
-
 
 @connection.connection_handler
 def uppdate_user_reputation(cursor: RealDictCursor, user_name: str, value: int):

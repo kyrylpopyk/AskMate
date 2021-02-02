@@ -257,7 +257,10 @@ def route_question(question_id):
             data_manager.remove_answer(question_id=question_id, answer_id=answer_id)
             return redirect(url_for('route_question', question_id=question_id))
 
-        reputation_target = request.args.get('reputation_target')
+        reputation_target = []
+        if 'reputation_target' in request.args:
+            reputation_target = request.args.get('reputation_target')
+
         data_manager.modify_views_votes(data_to_modify=data_to_modify, question=question, answers_list=answers_list, reputation_target=reputation_target)
         return redirect(url_for('route_question', question_id=question_id))
 
