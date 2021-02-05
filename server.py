@@ -1,7 +1,8 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask import Flask, render_template, request, redirect, url_for, flash, session, make_response
 from util import os
 from werkzeug.utils import secure_filename
 from forms import RegistrationForm, LoginForm, QuestionForm
+from flask_login import current_user, login_required
 import data_manager
 import util
 
@@ -63,8 +64,10 @@ def route_register():
 @app.route("/logout", methods=["GET"])
 def route_logout():
     session.pop("email", None)
+    resp = make_response(redirect(url_for('route_list')))
+    resp.set_cookie('user_name', 'user')
     flash("See You later :) !")
-    return redirect(url_for('route_list'))
+    return resp
 
 
 @app.route("/")
@@ -128,11 +131,15 @@ def route_list(order_by=data_manager.DEFAULT_ORDER_BY, order_direction=data_mana
     questions = pag_questions[int(pagination_index)]
 
     # ---------------------Render
-    return render_template(
+
+    resp = make_response(render_template(
         'list.html', questions=questions, asc_desc=switch_order_direction,
         pagination_count=len(pag_questions), last_tag_id=last_tag_id, last_order_by=order_by, is_search=is_search,
         last_search_phrase=last_search_phrase
-    )
+    ))
+    if 'email' not in session:
+        resp.set_cookie('user_name', 'user')
+    return resp
 
 
 @app.route('/add-question', methods=['GET', 'POST'])
@@ -187,6 +194,8 @@ def route_edit_question(question_id):
 
     if request.method == 'GET':
         tags = data_manager.fetch_tags()
+        for element in tags:
+            tags.remove(element) if element['tag_name'] == list(question)[0]['tag'] else None
         return render_template('add_question.html', question=list(question)[0], tags=tags)
 
     elif request.method == 'POST':
@@ -272,7 +281,9 @@ def route_question(question_id):
     elif request.method == 'POST':
         new_answer = {'message': request.form["message"]}
         if 'email' in session:
-            new_answer['user_name'] = data_manager.get_user_name_by_email(session.get('email'))
+            new_answer['user_name'] = data_manager.get_user_name_by_email(session.get('email'))[0]['user_name']
+        else:
+            new_answer['user_name'] = 'user'
         data_manager.add_answer(new_answer['message'], question_id, user_name=new_answer['user_name'])
         return redirect(url_for("route_question", question_id=question_id))
 
@@ -331,7 +342,9 @@ def login():
         if util.check_password(plain_password, hashed_pswd):
             session['email'] = email
             flash("You are logged in!")
-            return redirect(url_for("route_list", form=form))
+            resp = make_response(redirect(url_for("route_list", form=form)))
+            resp.set_cookie('user_name', data_manager.get_user_name_by_email(email=email)[0]["user_name"])
+            return resp
     flash("Invalid email or password, try again!")
     return render_template("login.html", form=form)
 

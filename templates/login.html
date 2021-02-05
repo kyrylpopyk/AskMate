@@ -10,10 +10,10 @@
 					<legend class="border-bottom mb-4 text-center">Log In</legend>
 					{{ macro_render_field(form.email) }}
 					{{ macro_render_field(form.password) }}
-					<div class="form-check">
-						{{ form.remember(class="form-check-input") }}
-						{{ form.remember.label(class="form-check-label") }}
-					</div>
+{#					<div class="form-check">#}
+{#						{{ form.remember(class="form-check-input") }}#}
+{#						{{ form.remember.label(class="form-check-label") }}#}
+{#					</div>#}
 				</fieldset>
 				<div class="form-group">{{ form.submit(class="btn btn-primary my-2") }}</div>
 			</form>

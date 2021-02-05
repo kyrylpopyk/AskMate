@@ -20,10 +20,10 @@
 						<div class="input-group w-25">
 							<label class="input-group-text" for="tag_name">tag</label>
 							<select class="form-select-sm" id="tag_name" name="tag_name" required>
-								<option selected></option>
-									{% for tag in tags %}
-								<option value={{ tag.tag_id }}>{{ tag.tag_name }}</option>
-							{% endfor %}
+								<option selected>{{ question.tag }}</option>
+									{% for tag in tags if tag != question.tag %}
+                                        <option value={{ tag.tag_id }}>{{ tag.tag_name }}</option>
+							        {% endfor %}
 							</select>
 						</div>
 						<label for="question_image" class="form-control-file">Image (optional max 3MB) </label>

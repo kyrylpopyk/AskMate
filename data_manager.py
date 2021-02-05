@@ -110,9 +110,10 @@ def find_comment_by_answer_id(cursor: RealDictCursor, answer_id: str) -> list:
 @connection.connection_handler
 def find_question_by_id(cursor: RealDictCursor, question_id: str) -> list:
     query = """
-    select  *
-    from question
-    where id = %(question_id)s;"""
+    select  question.id, question.submission_time, question.view_number, question.vote_number,
+     question.title, question.message, question.image, question.user_name, tag.name as tag
+    from question, question_tag, tag
+    where question.id = %(question_id)s and question_tag.question_id = question.id and question_tag.tag_id = tag.id;"""
     param = {'question_id': question_id}
     cursor.execute(query, param)
     return cursor.fetchall()
@@ -327,25 +328,27 @@ def edit_question(cursor, question_id, edited_data):
 
 
 @connection.connection_handler
-def save_answer(cursor, data):
+def save_answer(cursor: RealDictCursor, data):
     cursor.execute("""INSERT INTO answer VALUES (%(new_id_value)s, %(new_submission_time_value)s, %(new_vote_number_value)s, 
-                    %(new_question_id_value)s, %(new_message_value)s, %(new_image_value)s);""",
+                    %(new_question_id_value)s, %(new_message_value)s, %(new_image_value)s, %(user_name)s);""",
                    {"new_id_value": data['id'],
                     "new_submission_time_value": data['submission_time'],
                     "new_vote_number_value": data['vote_number'],
                     "new_question_id_value": data['question_id'],
                     "new_message_value": data['message'],
-                    "new_image_value": data['image']})
+                    "new_image_value": data['image'],
+                    "user_name": data['user_name']})
 
 
-def add_answer(new_answer, question_id):
+def add_answer(new_answer, question_id, user_name):
     new_answer_data = {
         "id": get_answer_id(),
         "submission_time": get_time(),
         "vote_number": "0",
         "question_id": question_id,
         "message": new_answer,
-        "image": ""
+        "image": "",
+        "user_name": user_name
     }
     save_answer(new_answer_data)
 
