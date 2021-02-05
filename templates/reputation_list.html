@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import macro_render_field %}
+{% block title %}Login{% endblock %}
+{% block content %}
+    <div class="grid_kir" >
+        {% for index in range(users|length) %}
+            <a href="#">
+                <div class="row_kir">
+                    <div class="col_number">
+                        <span>{{ index + 1 }}</span>
+                    </div>
+                    <div class="col_user_name">
+                        <span>{{ users[index].user_name }}</span>
+                    </div>
+                    <div class="col_reputation">
+                        <span>{{ users[index].reputation }}xp</span>
+                    </div>
+                </div>
+            </a>
+        {% endfor %}
+    </div>
+{% endblock content %}

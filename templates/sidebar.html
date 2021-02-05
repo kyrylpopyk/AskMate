@@ -4,6 +4,7 @@
     {% else %}
 	    <a class="btn btn-outline-primary my-3" href="{{ url_for('route_add_question') }}" role="button">Ask question</a>
     {% endif %}
+        <a class="btn btn-outline-primary my-3" style="margin-top: 0px !important;" href="{{ url_for('route_reputation') }}" role="button">Users reputation</a>
 	<p class="fw-bold my-1">Tags</p>
 	<div class="list-group">
 		{%- for tag in func_tags() -%}

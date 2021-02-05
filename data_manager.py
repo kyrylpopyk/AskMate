@@ -594,6 +594,17 @@ def is_user_name_available(cursor: RealDictCursor, user_name: str):
     else:
         return False
 
+@connection.connection_handler
+def get_users_data(cursor: RealDictCursor) -> list:
+    query = """
+    SELECT users.user_name, users.reputation, users.picture
+    from users
+    ORDER BY users.reputation DESC;
+    """
+    cursor.execute(query)
+    return cursor.fetchall()
+
+
 # --------------------------------------------------------------------------------------- AskMate v.1
 FIRST_ITEM = 0
 SECOND_ITEM = 1

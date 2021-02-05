@@ -1,0 +1,59 @@
+.grid_kir{
+    display: grid;
+    grid-auto-rows: auto;
+    max-width: 500px;
+    margin: 0 auto;
+    margin-top: 10%;
+    grid-row-gap: 20px;
+}
+
+.row_kir{
+    display: grid;
+    background-color: yellow;
+    grid-template-columns: 1fr 3fr 3fr;
+    /*grid-template-areas: "col_number" "col_user_name" "col_reputation";*/
+    background-color: #0d6efd;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    border-radius: 30px;
+    box-shadow: 0px 0px 2px black;
+    box-sizing: border-box;
+}
+
+.row_kir:hover{
+    box-shadow: 0px 0px 10px black;
+}
+
+.col_user_name > *{
+    color: white;
+    text-decoration: none;
+}
+
+.user_content{
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    grid-column-gap: 3px;
+}
+
+.user_content div{
+    border: 2px solid black;
+}
+
+.user_img > * {
+    max-width: 100%;
+    height: auto;
+}
+
+.nickname{
+    display: block;
+    text-align: center;
+}
+
+.user_parameters ul{
+    list-style-type: square;
+}
+
+
+
+

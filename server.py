@@ -348,6 +348,15 @@ def login():
     flash("Invalid email or password, try again!")
     return render_template("login.html", form=form)
 
+@app.route("/reputation")
+def route_reputation() -> 'html':
+    users = data_manager.get_users_data()
+    return render_template('reputation_list.html', users=users)
+
+@app.route("/account")
+def routr_account() -> 'html':
+    return render_template('account.html')
+
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=5050, debug=True)

@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import macro_render_field %}
+{% block title %}Login{% endblock %}
+{% block content %}
+<div class="user_content"> {#grid#}
+    <div class="user_img">
+        <img src="../static/img/default.png" alt="">
+        <span class="nickname">NickName</span>
+    </div>
+    <div class="user_parameters">
+        <ul>
+            <li class="element">
+                <span>Reputation position</span>
+            </li>
+            <li class="element">
+                <span>Reputation</span>
+            </li>
+            <li class="element">
+                <span>Registration date</span>
+            </li>
+            <li class="element">
+                <span>Questions</span>
+            </li>
+            <li class="element">
+                <span>Answers</span>
+            </li>
+            <li class="element">
+                <span>Comments</span>
+            </li>
+        </ul>
+    </div>
+</div>
+{% endblock content %}
