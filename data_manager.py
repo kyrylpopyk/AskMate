@@ -533,11 +533,11 @@ def check_password(cursor: RealDictCursor, password, email):
 
 
 @connection.connection_handler
-def register_new_user(cursor: RealDictCursor, user_name, email, password):
+def register_new_user(cursor: RealDictCursor, user_name, email, password, picture):
     cursor.execute("""
                     INSERT INTO users
-                    VALUES (%(user_id)s, %(user_name)s, %(email)s, %(password)s, %(register_date)s)
-                    """, {'user_id': get_user_id(), 'user_name': user_name, 'email': email, 'password': password, 'register_date': get_time()})
+                    VALUES (%(user_id)s, %(user_name)s, %(email)s, %(password)s, %(register_date)s, 0, %(picture)s);
+                    """, {'user_id': get_user_id(), 'user_name': user_name, 'email': email, 'password': password, 'register_date': get_time(), 'picture': picture})
 
 
 @connection.connection_handler

@@ -51,12 +51,24 @@ def route_register():
     email = request.form["email"]
     password = request.form["password"]
     confirm_password = request.form["confirm_password"]
+    img = request.files['picture']
+    img_name = img.filename
+
+    if len(img_name) > 0:
+        img_name = secure_filename(img_name)
+        file_ext = os.path.splitext(img_name)[1]
+
+        if not save_image(file_ext=file_ext, img=img, img_name=img_name):
+            flash('Wrong image extension, you can upload only .jpg, jpeg and .png files', 'danger')
+            return redirect(request.referrer)
+    else:
+        img_name = 'default.png'
 
     if password != confirm_password:
         flash("Passwords are not the same!")
         return render_template('register.html', form=form)
     hash_pswd = util.hash_password(password)
-    data_manager.register_new_user(username, email, hash_pswd)
+    data_manager.register_new_user(username, email, hash_pswd, picture=img_name)
     flash("Welcome in our team :) !!!")
     return redirect("register")
 
