@@ -57,12 +57,12 @@
 								<small class="text-muted">score: {{ question.vote_number }} votes</small>
 							</div>
 							<div class="col-sm">
-                                {% if request.cookies.get('user_name') != question.user_name and request.cookies['session']['email'] %}
+                                {% if request.cookies.get('user_name') != question.user_name and request.cookies['email'] %}
                                     <a href="{{ url_for('route_question', question_id=question.id, questions_votes=+1, reputation_target=question.user_name) }}"><i class="far fa-thumbs-up btn btn-outline-success"></i></a>&nbsp;&nbsp;
                                     <a href="{{ url_for('route_question', question_id=question.id, questions_votes=-1, reputation_target=question.user_name) }}"><i class="far fa-thumbs-down btn btn-outline-danger"></i></a>
 							    {% endif %}
                             </div>
-                            {% if request.cookies.get('user_name') == question.user_name and request.cookies['session']['email'] %}
+                            {% if request.cookies.get('user_name') == question.user_name and request.cookies['email'] %}
                                 <div class="col-sm text-end">
                                     <a href="{{ url_for('route_edit_question', question_id=question.id) }}">
                                         <button type="button" class="btn btn-outline-primary btn-sm">edit</button>
@@ -142,7 +142,7 @@
 				<div class="row ">
 					<div class="col-md-1" style="margin: auto 0">
 						<div class="row mt-3"><p class="text-center">
-                            {% if request.cookies.get('user_name') != answer.user_name and request.cookies['session']['email']%}
+                            {% if request.cookies.get('user_name') != answer.user_name and request.cookies['email']%}
 							    <a href="{{ url_for('route_question', question_id=question.id, answers_votes=+1, answer_id=answer.id, reputation_target=answer.user_name) }}"><i class="fas fa-chevron-up"></i></a>
 						    {% endif %}
                         </p></div>
@@ -155,7 +155,7 @@
 							{% endif %}
 						</p></div>
 						<div class="row mb-3"><p class="text-center">
-                            {% if request.cookies.get('user_name') != answer.user_name and request.cookies['session']['email']%}
+                            {% if request.cookies.get('user_name') != answer.user_name and request.cookies['email']%}
 							    <a href="{{ url_for('route_question', question_id=question.id, answers_votes=-1, answer_id=answer.id, reputation_target=answer.user_name) }}"><i class="fas fa-chevron-down"></i></a>
                             {% endif %}
                         </p></div>
@@ -192,7 +192,7 @@
 									<small class="text-muted">updated {{ answer.submission_time }}</small>
 								</div>
 								<div class="col-sm text-end">
-                                    {% if request.cookies.get('user_name') == answer.user_name and request.cookies['session']['email'] %}
+                                    {% if request.cookies.get('user_name') == answer.user_name and request.cookies['email'] %}
                                         <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#update_answer">
                                             edit
                                         </button>

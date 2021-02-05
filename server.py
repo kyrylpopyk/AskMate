@@ -139,6 +139,7 @@ def route_list(order_by=data_manager.DEFAULT_ORDER_BY, order_direction=data_mana
     ))
     if 'email' not in session:
         resp.set_cookie('user_name', 'user')
+        resp.set_cookie('email', '')
     return resp
 
 
@@ -344,6 +345,7 @@ def login():
             flash("You are logged in!")
             resp = make_response(redirect(url_for("route_list", form=form)))
             resp.set_cookie('user_name', data_manager.get_user_name_by_email(email=email)[0]["user_name"])
+            resp.set_cookie('email', email)
             return resp
     flash("Invalid email or password, try again!")
     return render_template("login.html", form=form)
