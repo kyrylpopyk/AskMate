@@ -62,7 +62,7 @@
                                     <a href="{{ url_for('route_question', question_id=question.id, questions_votes=-1, reputation_target=question.user_name) }}"><i class="far fa-thumbs-down btn btn-outline-danger"></i></a>
 							    {% endif %}
                             </div>
-                            {% if request.cookies.get('user_name') == question.user_name %}
+                            {% if request.cookies.get('user_name') == question.user_name and request.cookies['session']['email'] %}
                                 <div class="col-sm text-end">
                                     <a href="{{ url_for('route_edit_question', question_id=question.id) }}">
                                         <button type="button" class="btn btn-outline-primary btn-sm">edit</button>
@@ -192,7 +192,7 @@
 									<small class="text-muted">updated {{ answer.submission_time }}</small>
 								</div>
 								<div class="col-sm text-end">
-                                    {% if request.cookies.get('user_name') == answer.user_name %}
+                                    {% if request.cookies.get('user_name') == answer.user_name and request.cookies['session']['email'] %}
                                         <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#update_answer">
                                             edit
                                         </button>
