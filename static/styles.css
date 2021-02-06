@@ -5,6 +5,7 @@
     margin: 0 auto;
     margin-top: 10%;
     grid-row-gap: 20px;
+    box-sizing: border-box;
 }
 
 .row_kir{
@@ -58,6 +59,18 @@
     margin: 10px 0px;
 }
 
+.grid_kir a{
+    text-decoration: none;
+}
+
+.nav_user_name{
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.nav_user_name:hover{
+    text-shadow: 0 0 4px black;
+}
 
 
 

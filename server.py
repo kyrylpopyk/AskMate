@@ -139,7 +139,7 @@ def route_list(order_by=data_manager.DEFAULT_ORDER_BY, order_direction=data_mana
 
     # ---------------------Pagination
     pagination_index = request.args['pagination_index'] if 'pagination_index' in request.args else 0
-    pag_questions = (data_manager.pagination(data=questions, pagination_range=20))
+    pag_questions = (data_manager.pagination(data=questions, pagination_range=pagination_size))
     questions = pag_questions[int(pagination_index)]
 
     # ---------------------Render
