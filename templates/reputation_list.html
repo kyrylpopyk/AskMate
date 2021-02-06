@@ -4,19 +4,35 @@
 {% block content %}
     <div class="grid_kir" >
         {% for index in range(users|length) %}
-            <a href={{ url_for("route_account", user_name=users[index].user_name) }}>
-                <div class="row_kir">
-                    <div class="col_number">
-                        <span>{{ index + 1 }}</span>
+            {% if users[index].user_name == request.cookies.get('user_name') %}
+            <a href="#">
+                    <div class="row_kir" style="background-color: #000000;">
+                        <div class="col_number">
+                            <span>{{ index + 1 }}</span>
+                        </div>
+                        <div class="col_user_name">
+                            <span>{{ users[index].user_name }}</span>
+                        </div>
+                        <div class="col_reputation">
+                            <span>{{ users[index].reputation }}xp</span>
+                        </div>
                     </div>
-                    <div class="col_user_name">
-                        <span>{{ users[index].user_name }}</span>
+                </a>
+            {% else %}
+                <a href="#">
+                    <div class="row_kir">
+                        <div class="col_number">
+                            <span>{{ index + 1 }}</span>
+                        </div>
+                        <div class="col_user_name">
+                            <span>{{ users[index].user_name }}</span>
+                        </div>
+                        <div class="col_reputation">
+                            <span>{{ users[index].reputation }}xp</span>
+                        </div>
                     </div>
-                    <div class="col_reputation">
-                        <span>{{ users[index].reputation }}xp</span>
-                    </div>
-                </div>
-            </a>
+                </a>
+            {% endif %}
         {% endfor %}
     </div>
 {% endblock content %}

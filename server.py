@@ -51,12 +51,24 @@ def route_register():
     email = request.form["email"]
     password = request.form["password"]
     confirm_password = request.form["confirm_password"]
+    img = request.files['picture']
+    img_name = img.filename
+
+    if len(img_name) > 0:
+        img_name = secure_filename(img_name)
+        file_ext = os.path.splitext(img_name)[1]
+
+        if not save_image(file_ext=file_ext, img=img, img_name=img_name):
+            flash('Wrong image extension, you can upload only .jpg, jpeg and .png files', 'danger')
+            return redirect(request.referrer)
+    else:
+        img_name = 'default.png'
 
     if password != confirm_password:
         flash("Passwords are not the same!")
         return render_template('register.html', form=form)
     hash_pswd = util.hash_password(password)
-    data_manager.register_new_user(username, email, hash_pswd)
+    data_manager.register_new_user(username, email, hash_pswd, picture=img_name)
     flash("Welcome in our team :) !!!")
     return redirect("register")
 
@@ -127,7 +139,7 @@ def route_list(order_by=data_manager.DEFAULT_ORDER_BY, order_direction=data_mana
 
     # ---------------------Pagination
     pagination_index = request.args['pagination_index'] if 'pagination_index' in request.args else 0
-    pag_questions = (data_manager.pagination(data=questions, pagination_range=20))
+    pag_questions = (data_manager.pagination(data=questions, pagination_range=pagination_size))
     questions = pag_questions[int(pagination_index)]
 
     # ---------------------Render
@@ -139,6 +151,7 @@ def route_list(order_by=data_manager.DEFAULT_ORDER_BY, order_direction=data_mana
     ))
     if 'email' not in session:
         resp.set_cookie('user_name', 'user')
+        resp.set_cookie('email', '')
     return resp
 
 
@@ -270,13 +283,23 @@ def route_question(question_id):
         if 'reputation_target' in request.args:
             reputation_target = request.args.get('reputation_target')
 
-        data_manager.modify_views_votes(data_to_modify=data_to_modify, question=question, answers_list=answers_list, reputation_target=reputation_target)
+        data_manager.modify_views_votes(data_to_modify=data_to_modify, question=question, answers_list=answers_list,
+                                        reputation_target=reputation_target,
+                                        reputation_giver=data_manager.get_user_name_by_email(session.get('email'))[0]['user_name'])
+
         return redirect(url_for('route_question', question_id=question_id))
 
     if request.method == 'GET':
+
         list_comments_for_answers = data_manager.find_comment_by_answer_id
 
-        return render_template('question.html', question=question[0], answers=answers_list, comments_for_question=list_comments_for_question, comments_for_answers=list_comments_for_answers)
+        q_pos_neg = data_manager.question_positive_negative_vote(question_id=question_id)
+        a_pos_neg = data_manager.answers_positive_negative_vote(question_id=question_id)
+
+        return render_template('question.html', question=question[0], answers=answers_list,
+                               comments_for_question=list_comments_for_question,
+                               comments_for_answers=list_comments_for_answers, a_pos_neg=a_pos_neg,
+                               q_pos_neg=q_pos_neg)
 
     elif request.method == 'POST':
         new_answer = {'message': request.form["message"]}
@@ -344,6 +367,7 @@ def login():
             flash("You are logged in!")
             resp = make_response(redirect(url_for("route_list", form=form)))
             resp.set_cookie('user_name', data_manager.get_user_name_by_email(email=email)[0]["user_name"])
+            resp.set_cookie('email', email)
             return resp
     flash("Invalid email or password, try again!")
     return render_template("login.html", form=form)

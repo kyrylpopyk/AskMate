@@ -4,6 +4,7 @@ from datetime import datetime
 
 from psycopg2.extras import RealDictCursor
 
+
 import connection
 
 DEFAULT_ORDER_BY = 'submission_time'
@@ -236,11 +237,14 @@ def find_all_answers_by_question_id(cursor: RealDictCursor, question_id: str):
     return cursor.fetchall()
 
 
-def modify_views_votes(data_to_modify: dict, question: list, answers_list: list, reputation_target: str) -> None:
+def modify_views_votes(data_to_modify: dict, question: list, answers_list: list, reputation_target: str, reputation_giver: str) -> None:
     for key in data_to_modify.keys():
         if key == 'questions_votes':
             if is_user_name_available(user_name=reputation_target):
                 uppdate_user_reputation(user_name=reputation_target, value=data_to_modify.get(key))
+            #Funkcja która dodaje odpowied vote: question_id, ansver_id, user_name, status(positive and negative)
+            add_vote_reg(question_id=question[0]['id'], answer_id=None, user_name=reputation_giver,
+                         status='Positive' if int(data_to_modify.get(key)) > 0 else 'Negative')
             modify_question_votes(question_id=question[0]['id'], value=data_to_modify.get(key))
         elif key == 'questions_views':
             modify_question_views(question_id=question[0]['id'])
@@ -251,6 +255,9 @@ def modify_views_votes(data_to_modify: dict, question: list, answers_list: list,
                     answer.append(row)
             if is_user_name_available(user_name=reputation_target):
                 uppdate_user_reputation(user_name=reputation_target, value=data_to_modify.get(key))
+            # Funkcja która dodaje odpowied vote: question_id, ansver_id, user_name, status(positive and negative)
+            add_vote_reg(question_id=question[0]['id'], answer_id=answer[0]['id'], user_name=reputation_giver,
+                         status='Positive' if int(data_to_modify.get(key)) > 0 else 'Negative')
             modify_answer_votes(question_id=question[0]['id'], answer_id=answer[0]['id'], value=data_to_modify.get(key))
 
 
@@ -549,11 +556,11 @@ def check_password(cursor: RealDictCursor, password, email):
 
 
 @connection.connection_handler
-def register_new_user(cursor: RealDictCursor, user_name, email, password):
+def register_new_user(cursor: RealDictCursor, user_name, email, password, picture):
     cursor.execute("""
                     INSERT INTO users
-                    VALUES (%(user_id)s, %(user_name)s, %(email)s, %(password)s, %(register_date)s)
-                    """, {'user_id': get_user_id(), 'user_name': user_name, 'email': email, 'password': password, 'register_date': get_time()})
+                    VALUES (%(user_id)s, %(user_name)s, %(email)s, %(password)s, %(register_date)s, 0, %(picture)s);
+                    """, {'user_id': get_user_id(), 'user_name': user_name, 'email': email, 'password': password, 'register_date': get_time(), 'picture': picture})
 
 
 @connection.connection_handler
@@ -620,6 +627,56 @@ def get_users_data(cursor: RealDictCursor) -> list:
     cursor.execute(query)
     return cursor.fetchall()
 
+@connection.connection_handler
+def add_vote_reg(cursor: RealDictCursor, question_id: int, answer_id: int, user_name: str, status: str):
+    command = """
+    INSERT INTO reg_votes
+    VALUES ( %(question_id)s, %(answer_id)s, %(user_name)s, %(status)s );
+    """
+    param = {
+        'question_id': question_id,
+        'answer_id': answer_id,
+        'user_name': user_name,
+        'status': status
+    }
+    cursor.execute(command, param)
+
+@connection.connection_handler
+def question_positive_negative_vote(cursor: RealDictCursor, question_id: int):
+    querry = """
+    SELECT reg_votes.question_id as id, reg_votes.user_name, reg_votes.status
+    FROM reg_votes
+    WHERE reg_votes.question_id = %(question_id)s AND reg_votes.answer_id IS NULL;
+    """
+    param = {'question_id': question_id}
+    cursor.execute(querry, param)
+    pos_neg = split_answers_questions_votes(cursor.fetchall())
+
+    return pos_neg
+
+
+def split_answers_questions_votes(vote_data: list):
+    pos_neg = {}
+    if len(vote_data) > 0:
+        for element in vote_data:
+            if element['id'] not in pos_neg:
+                pos_neg[element['id']] = []
+            pos_neg[element['id']].append(element['user_name'])
+
+    return pos_neg
+
+@connection.connection_handler
+def answers_positive_negative_vote(cursor: RealDictCursor, question_id: int):
+    querry = """
+        SELECT reg_votes.answer_id as id, reg_votes.user_name, reg_votes.status
+        FROM reg_votes
+        WHERE reg_votes.question_id = %(question_id)s and reg_votes.answer_id IS NOT NULL ;
+        """
+    param = {'question_id': question_id}
+    cursor.execute(querry, param)
+    pos_neg = split_answers_questions_votes(cursor.fetchall())
+
+    return pos_neg
 
 # --------------------------------------------------------------------------------------- AskMate v.1
 FIRST_ITEM = 0

@@ -57,12 +57,13 @@
 								<small class="text-muted">score: {{ question.vote_number }} votes</small>
 							</div>
 							<div class="col-sm">
-                                {% if request.cookies.get('user_name') != question.user_name and request.cookies['session']['email'] %}
+                                {% if (request.cookies.get('user_name') != question.user_name and request.cookies['email'])
+                                        and (question.id not in q_pos_neg or request.cookies.get('user_name') not in q_pos_neg[question.id])%}
                                     <a href="{{ url_for('route_question', question_id=question.id, questions_votes=+1, reputation_target=question.user_name) }}"><i class="far fa-thumbs-up btn btn-outline-success"></i></a>&nbsp;&nbsp;
                                     <a href="{{ url_for('route_question', question_id=question.id, questions_votes=-1, reputation_target=question.user_name) }}"><i class="far fa-thumbs-down btn btn-outline-danger"></i></a>
-							    {% endif %}
+                                {% endif %}
                             </div>
-                            {% if request.cookies.get('user_name') == question.user_name and request.cookies['session']['email'] %}
+                            {% if request.cookies.get('user_name') == question.user_name and request.cookies['email'] %}
                                 <div class="col-sm text-end">
                                     <a href="{{ url_for('route_edit_question', question_id=question.id) }}">
                                         <button type="button" class="btn btn-outline-primary btn-sm">edit</button>
@@ -142,7 +143,8 @@
 				<div class="row ">
 					<div class="col-md-1" style="margin: auto 0">
 						<div class="row mt-3"><p class="text-center">
-                            {% if request.cookies.get('user_name') != answer.user_name and request.cookies['session']['email']%}
+                            {% if (request.cookies.get('user_name') != answer.user_name and request.cookies['email']) and
+                                    (answer.id not in a_pos_neg or request.cookies.get('user_name') not in a_pos_neg[answer.id])%}
 							    <a href="{{ url_for('route_question', question_id=question.id, answers_votes=+1, answer_id=answer.id, reputation_target=answer.user_name) }}"><i class="fas fa-chevron-up"></i></a>
 						    {% endif %}
                         </p></div>
@@ -155,21 +157,22 @@
 							{% endif %}
 						</p></div>
 						<div class="row mb-3"><p class="text-center">
-                            {% if request.cookies.get('user_name') != answer.user_name and request.cookies['session']['email']%}
+                            {% if (request.cookies.get('user_name') != answer.user_name and request.cookies['email']) and
+                                    (answer.id not in a_pos_neg or request.cookies.get('user_name') not in a_pos_neg[answer.id])%}
 							    <a href="{{ url_for('route_question', question_id=question.id, answers_votes=-1, answer_id=answer.id, reputation_target=answer.user_name) }}"><i class="fas fa-chevron-down"></i></a>
                             {% endif %}
                         </p></div>
 					</div>
 					<div class="col-xxl">
 						<div class="card-body">
-							<p>{{ answer.message }}</p>
+							<p><span class="badge bg-primary"><a class="link-light text-decoration-none" href="">{{ answer.user_name }}</a></span> {{ answer.message }}</p>
                                 {% set answer_comments = comments_for_answers(answer.id|int) %}
 							{% if answer_comments %}
 								<table class="table text-muted">
 									<tbody>
 									{% for comment in answer_comments %}
 										<tr>
-											<td class="border-bottom-0" style="font-size: small">{{ comment.message }} -
+											<td class="border-bottom-0" style="font-size: small">{{ comment.message }}
 												<small style="font-size: small" class="text-muted"><a class="text-decoration-none" href="#">{{ comment.user_name }}</a></small>
 											</td>
 										</tr>
@@ -192,7 +195,7 @@
 									<small class="text-muted">updated {{ answer.submission_time }}</small>
 								</div>
 								<div class="col-sm text-end">
-                                    {% if request.cookies.get('user_name') == answer.user_name and request.cookies['session']['email'] %}
+                                    {% if request.cookies.get('user_name') == answer.user_name and request.cookies['email'] %}
                                         <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#update_answer">
                                             edit
                                         </button>
