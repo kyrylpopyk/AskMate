@@ -283,13 +283,23 @@ def route_question(question_id):
         if 'reputation_target' in request.args:
             reputation_target = request.args.get('reputation_target')
 
-        data_manager.modify_views_votes(data_to_modify=data_to_modify, question=question, answers_list=answers_list, reputation_target=reputation_target)
+        data_manager.modify_views_votes(data_to_modify=data_to_modify, question=question, answers_list=answers_list,
+                                        reputation_target=reputation_target,
+                                        reputation_giver=data_manager.get_user_name_by_email(session.get('email'))[0]['user_name'])
+
         return redirect(url_for('route_question', question_id=question_id))
 
     if request.method == 'GET':
+
         list_comments_for_answers = data_manager.find_comment_by_answer_id
 
-        return render_template('question.html', question=question[0], answers=answers_list, comments_for_question=list_comments_for_question, comments_for_answers=list_comments_for_answers)
+        q_pos_neg = data_manager.question_positive_negative_vote(question_id=question_id)
+        a_pos_neg = data_manager.answers_positive_negative_vote(question_id=question_id)
+
+        return render_template('question.html', question=question[0], answers=answers_list,
+                               comments_for_question=list_comments_for_question,
+                               comments_for_answers=list_comments_for_answers, a_pos_neg=a_pos_neg,
+                               q_pos_neg=q_pos_neg)
 
     elif request.method == 'POST':
         new_answer = {'message': request.form["message"]}
