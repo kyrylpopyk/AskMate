@@ -9,6 +9,7 @@ import connection
 DEFAULT_ORDER_BY = 'submission_time'
 DEFAULT_ORDER_DIR = 'ASC'
 
+
 @connection.connection_handler
 def remove_question(cursor: RealDictCursor, question_id: int) -> None:
     answers_id = get_answers_id_by_question(question_id=question_id)
@@ -60,6 +61,7 @@ def get_questions_data(cursor: RealDictCursor, asc_desc: str, sort_column_by: st
     cursor.execute(query, parameter)
     return cursor.fetchall()
 
+
 @connection.connection_handler
 def get_questions_data_by_tag(cursor: RealDictCursor, asc_desc: str, sort_column_by: str, tag_id: int) -> dict:
     query = """ 
@@ -87,6 +89,20 @@ def get_questions_data_by_tag(cursor: RealDictCursor, asc_desc: str, sort_column
     """.format(sort_column_by, asc_desc, tag_id)
     cursor.execute(query)
     return cursor.fetchall()
+
+
+@connection.connection_handler
+def get_user_data(cursor: RealDictCursor):
+    query = """
+    SELECT
+    users.email,
+    user_name as "user",
+    register_date as "date",
+    reputation as "rep",
+    count(answer.message) as "answers_count",
+    count(comment.message) as "comments_count",
+    from users
+    """
 
 
 @connection.connection_handler

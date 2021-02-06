@@ -4,7 +4,7 @@
 {% block content %}
     <div class="grid_kir" >
         {% for index in range(users|length) %}
-            <a href="#">
+            <a href={{ url_for("route_account", user_name=users[index].user_name) }}>
                 <div class="row_kir">
                     <div class="col_number">
                         <span>{{ index + 1 }}</span>
