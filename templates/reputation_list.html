@@ -5,7 +5,7 @@
     <div class="grid_kir" >
         {% for index in range(users|length) %}
             {% if users[index].user_name == request.cookies.get('user_name') %}
-            <a href="#">
+            <a href="{{ url_for("route_account", user_name = users[index].user_name) }}">
                     <div class="row_kir" style="background-color: #000000;">
                         <div class="col_number">
                             <span>{{ index + 1 }}</span>
@@ -19,7 +19,7 @@
                     </div>
                 </a>
             {% else %}
-                <a href="#">
+                <a href={{ url_for("route_account", user_name = users[index].user_name) }}>
                     <div class="row_kir">
                         <div class="col_number">
                             <span>{{ index + 1 }}</span>

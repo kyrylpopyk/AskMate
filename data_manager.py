@@ -93,17 +93,30 @@ def get_questions_data_by_tag(cursor: RealDictCursor, asc_desc: str, sort_column
 
 
 @connection.connection_handler
-def get_user_data(cursor: RealDictCursor):
+def get_user_data(cursor: RealDictCursor, user_name):
     query = """
     SELECT
     users.email,
-    user_name as "user",
+    users.user_name as user_name,
     register_date as "date",
     reputation as "rep",
-    count(answer.message) as "answers_count",
-    count(comment.message) as "comments_count",
+    users.picture as "picture",
+    count(answer.message) as answers_count,
+    count(question.message) as question_count,
+    count(comment.message) as comment_count
     from users
+    left join answer
+    on answer.user_name = users.user_name
+    left join question
+    on question.user_name = users.user_name
+    left join comment
+    on comment.user_name = users.user_name
+    where users.user_name = %(user_name)s
+    group by users.email, users.user_name, register_date, reputation, users.picture;
     """
+    param = {"user_name": user_name}
+    cursor.execute(query, param)
+    return cursor.fetchall()
 
 
 @connection.connection_handler

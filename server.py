@@ -382,7 +382,10 @@ def route_reputation() -> 'html':
 @app.route("/account")
 def route_account() -> 'html':
     user_name = request.args.get("user_name")
-    return render_template('account.html', )
+    user_data = data_manager.get_user_data(user_name)
+
+
+    return render_template('account.html', user_data = user_data[0])
 
 
 if __name__ == '__main__':

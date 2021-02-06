@@ -36,7 +36,7 @@
 		<div class="container">
 			<div class="row">
 				<div class="row">
-					<div class="col-lg-8 fs- fw-bold">{{ question.title }} <span class="badge bg-dark" style="margin-left: 20px;"><a class="link-light text-decoration-none" href="">{{ question.user_name }}</a></span></div>
+					<div class="col-lg-8 fs- fw-bold">{{ question.title }} <span class="badge bg-dark" style="margin-left: 20px;"><a class="link-light text-decoration-none" href="{{ url_for("route_account", user_name = question.user_name) }}">{{ question.user_name }}</a></span></div>
 				</div>
 				<div class="col-md-3">
 					{% if question.image %}
@@ -88,7 +88,7 @@
 													<tr>
 														<td>{{ comment.message }}</td>
 														<td>
-															<small class="text-muted"><a class="text-decoration-none" href="#">{{ comment.user_name }}</a></small>
+															<small class="text-muted"><a class="text-decoration-none" href="{{ url_for("route_account", user_name = comment.user_name) }}">{{ comment.user_name }}</a></small>
 														</td>
 													</tr>
 												{% endfor %}
@@ -165,7 +165,7 @@
 					</div>
 					<div class="col-xxl">
 						<div class="card-body">
-							<p><span class="badge bg-primary"><a class="link-light text-decoration-none" href="">{{ answer.user_name }}</a></span> {{ answer.message }}</p>
+							<p><span class="badge bg-primary"><a class="link-light text-decoration-none" href="{{ url_for("route_account", user_name = answer.user_name) }}">{{ answer.user_name }}</a></span> {{ answer.message }}</p>
                                 {% set answer_comments = comments_for_answers(answer.id|int) %}
 							{% if answer_comments %}
 								<table class="table text-muted">
@@ -173,7 +173,7 @@
 									{% for comment in answer_comments %}
 										<tr>
 											<td class="border-bottom-0" style="font-size: small">{{ comment.message }}
-												<small style="font-size: small" class="text-muted"><a class="text-decoration-none" href="#">{{ comment.user_name }}</a></small>
+												<small style="font-size: small" class="text-muted"><a class="text-decoration-none" href="{{ url_for("route_account", user_name = comment.user_name) }}">{{ comment.user_name }}</a></small>
 											</td>
 										</tr>
 									{% endfor %}

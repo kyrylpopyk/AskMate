@@ -181,7 +181,7 @@
 							<span class="badge bg-secondary">comments: {{ item.comments_count }} </span>
 						</li>
 						<li class="list-inline-item">
-                            <span class="badge bg-dark"><a class="link-light text-decoration-none" href="">{{ item.user_name }}</a></span>
+                            <span class="badge bg-dark"><a class="link-light text-decoration-none" href="{{ url_for("route_account", user_name = item.user_name) }}">{{ item.user_name }}</a></span>
 						</li>
 					</ul>
 				</div>

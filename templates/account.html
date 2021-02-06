@@ -4,28 +4,40 @@
 {% block content %}
 <div class="user_content"> {#grid#}
     <div class="user_img">
-        <img src="../static/img/default.png" alt="">
-        <span class="nickname">NickName</span>
+        <img src="../static/img/{{ user_data.picture }}" alt="">
+        <span class="nickname">{{ user_data.user_name }}</span>
     </div>
     <div class="user_parameters">
         <ul>
             <li class="element">
-                <span>Reputation position</span>
+                <div>
+                    <span class="description">Reputation: </span>
+                    <span>{{ user_data.rep }}</span>
+                </div>
             </li>
             <li class="element">
-                <span>Reputation</span>
+                <div>
+                    <span class="description">Date of registration: </span>
+                    <span>{{ user_data.date}}</span>
+                </div>
             </li>
             <li class="element">
-                <span>Registration date</span>
+                <div>
+                    <span class="description">Your questions count: </span>
+                    <span>{{ user_data.question_count }}</span>
+                </div>
             </li>
             <li class="element">
-                <span>Questions</span>
+                <div>
+                    <span class="description">Yours answers count: </span>
+                    <span>{{ user_data.answers_count }}</span>
+                </div>
             </li>
             <li class="element">
-                <span>Answers</span>
-            </li>
-            <li class="element">
-                <span>Comments</span>
+                <div>
+                    <span class="description">Your comments count: </span>
+                    <span>{{ user_data.comment_count }}</span>
+                </div>
             </li>
         </ul>
     </div>

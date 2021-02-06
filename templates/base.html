@@ -32,7 +32,7 @@
 			</form>
 			<div class="navbar-nav">
                 {% if request.cookies.get('user_name') != 'user' and  request.cookies.get('session')%}
-					<a class="nav-item nav-link text-white" href="" style="margin: auto 0">Account</a>
+					<a class="nav-item nav-link text-white" href="{{ url_for("route_account", user_name = request.cookies.get("user_name")) }}" style="margin: auto 0">Account</a>
 					<a class="nav-item nav-link text-white" style="text-align: center" href="{{ url_for('route_logout') }}">Logout <span class="nav_user_name">{{ request.cookies.get('user_name') }}</span></a>
 				{% else %}
 					<a class="nav-item nav-link text-white" href="{{ url_for('login') }}">Login</a>
