@@ -385,7 +385,7 @@ def route_account() -> 'html':
     user_data = data_manager.get_user_data(user_name)
 
 
-    return render_template('account.html', user_data = user_data[0])
+    return render_template('account.html', user_data = user_data)
 
 
 if __name__ == '__main__':

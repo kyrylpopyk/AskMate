@@ -100,23 +100,14 @@ def get_user_data(cursor: RealDictCursor, user_name):
     users.user_name as user_name,
     register_date as "date",
     reputation as "rep",
-    users.picture as "picture",
-    count(answer.message) as answers_count,
-    count(question.message) as question_count,
-    count(comment.message) as comment_count
+    users.picture as "picture"
     from users
-    left join answer
-    on answer.user_name = users.user_name
-    left join question
-    on question.user_name = users.user_name
-    left join comment
-    on comment.user_name = users.user_name
-    where users.user_name = %(user_name)s
-    group by users.email, users.user_name, register_date, reputation, users.picture;
+    WHERE users.user_name = %(user_name)s
     """
     param = {"user_name": user_name}
     cursor.execute(query, param)
-    return cursor.fetchall()
+    user_data = {**cursor.fetchall()[0], **get_answer_count_by_user_name(user_name), **get_question_count_by_user_name(user_name), **get_comment_count_by_user_name(user_name)}
+    return user_data
 
 
 @connection.connection_handler
@@ -690,6 +681,39 @@ def answers_positive_negative_vote(cursor: RealDictCursor, question_id: int):
     pos_neg = split_answers_questions_votes(cursor.fetchall())
 
     return pos_neg
+
+@connection.connection_handler
+def get_question_count_by_user_name(cursor: RealDictCursor, user_name: str):
+    query = """
+    SELECT count(question.user_name) as question_count
+    FROM question
+    WHERE question.user_name = %(user_name)s
+    """
+    param = {'user_name': user_name}
+    cursor.execute(query, param)
+    return cursor.fetchall()[0]
+
+@connection.connection_handler
+def get_answer_count_by_user_name(cursor: RealDictCursor, user_name: str):
+    query = """
+        SELECT count(answer.user_name) as answer_count
+        FROM answer
+        WHERE answer.user_name = %(user_name)s
+        """
+    param = {'user_name': user_name}
+    cursor.execute(query, param)
+    return cursor.fetchall()[0]
+
+@connection.connection_handler
+def get_comment_count_by_user_name(cursor: RealDictCursor, user_name: str):
+    query = """
+            SELECT count(comment.user_name) as comment_count
+            FROM comment
+            WHERE comment.user_name = %(user_name)s
+            """
+    param = {'user_name': user_name}
+    cursor.execute(query, param)
+    return cursor.fetchall()[0]
 
 # --------------------------------------------------------------------------------------- AskMate v.1
 FIRST_ITEM = 0

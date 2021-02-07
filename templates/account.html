@@ -8,38 +8,26 @@
         <span class="nickname">{{ user_data.user_name }}</span>
     </div>
     <div class="user_parameters">
-        <ul>
-            <li class="element">
-                <div>
-                    <span class="description">Reputation: </span>
-                    <span>{{ user_data.rep }}</span>
-                </div>
-            </li>
-            <li class="element">
-                <div>
-                    <span class="description">Date of registration: </span>
-                    <span>{{ user_data.date}}</span>
-                </div>
-            </li>
-            <li class="element">
-                <div>
-                    <span class="description">Your questions count: </span>
-                    <span>{{ user_data.question_count }}</span>
-                </div>
-            </li>
-            <li class="element">
-                <div>
-                    <span class="description">Yours answers count: </span>
-                    <span>{{ user_data.answers_count }}</span>
-                </div>
-            </li>
-            <li class="element">
-                <div>
-                    <span class="description">Your comments count: </span>
-                    <span>{{ user_data.comment_count }}</span>
-                </div>
-            </li>
-        </ul>
+        <div class="element">
+            <span class="description">Reputation: </span>
+            <span>{{ user_data.rep }}</span>
+        </div>
+        <div class="element">
+            <span class="description">Date of registration: </span>
+            <span>{{ user_data.date}}</span>
+        </div>
+        <div class="element">
+            <span class="description">Questions count: </span>
+            <span>{{ user_data.question_count }}</span>
+        </div>
+        <div class="element">
+            <span class="description">Answers count: </span>
+            <span>{{ user_data.answer_count }}</span>
+        </div>
+        <div class="element">
+            <span class="description">Comments count: </span>
+            <span>{{ user_data.comment_count }}</span>
+        </div>
     </div>
 </div>
 {% endblock content %}

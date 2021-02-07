@@ -33,26 +33,30 @@
 
 .user_content{
     display: grid;
-    grid-template-columns: 1fr 3fr;
+    grid-template-columns: 2fr 4fr;
     grid-column-gap: 3px;
+    grid-column-gap: 10px;
 }
 
 .user_content div{
-    border: 2px solid black;
 }
 
-.user_img > * {
+.user_img img {
     max-width: 100%;
     height: auto;
+    border-radius: 30px;
 }
 
 .nickname{
-    display: block;
+    justify-self: center;
     text-align: center;
-}
-
-.user_parameters ul{
-    list-style-type: square;
+    background-color: #0d6efd;
+    color: white;
+    font-weight: bold;
+    padding: 6px;
+    border-radius: 30px;
+    font-size: 20px;
+    box-shadow: 0 0 5px black;
 }
 
 .element{
@@ -75,4 +79,26 @@
 .description{
     font-weight: bold;
 }
+
+.user_img{
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-row-gap: 10px;
+}
+
+.user_img img{
+    box-shadow: 0 0 5px black;
+}
+
+.user_parameters{
+    display: grid;
+    grid-template-columns: 1fr;
+    background-color: #0d6efd;
+    justify-items: center;
+    color: white;
+    border-radius: 40px;
+    font-size: 17px;
+    box-shadow: 0 0 5px black;
+}
+
 
