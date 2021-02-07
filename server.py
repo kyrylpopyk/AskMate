@@ -70,7 +70,7 @@ def route_register():
     hash_pswd = util.hash_password(password)
     data_manager.register_new_user(username, email, hash_pswd, picture=img_name)
     flash("Welcome in our team :) !!!")
-    return redirect("register")
+    return redirect("login")
 
 
 @app.route("/logout", methods=["GET"])
@@ -282,10 +282,15 @@ def route_question(question_id):
         reputation_target = []
         if 'reputation_target' in request.args:
             reputation_target = request.args.get('reputation_target')
+        data = session
+        reputation_giver = 'user'
+        if 'email' in session:
+            reputation_giver = data_manager.get_user_name_by_email(session.get('email'))[0]['user_name']
+
 
         data_manager.modify_views_votes(data_to_modify=data_to_modify, question=question, answers_list=answers_list,
                                         reputation_target=reputation_target,
-                                        reputation_giver=data_manager.get_user_name_by_email(session.get('email'))[0]['user_name'])
+                                        reputation_giver=reputation_giver)
 
         return redirect(url_for('route_question', question_id=question_id))
 
