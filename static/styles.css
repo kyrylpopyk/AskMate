@@ -36,6 +36,7 @@
     grid-template-columns: 2fr 4fr;
     grid-column-gap: 3px;
     grid-column-gap: 10px;
+    margin-top: 20px;
 }
 
 .user_content div{
